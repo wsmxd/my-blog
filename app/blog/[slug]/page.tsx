@@ -10,8 +10,12 @@ type Props = {
 import { ErrorBoundary } from "../../components/ErrorBoundary";
 
 const PostContent = async ({ post }: { post: Awaited<ReturnType<typeof getPostBySlug>> }) => {
-  const { GISCUS_REPO, GISCUS_REPO_ID, GISCUS_CATEGORY, GISCUS_CATEGORY_ID } = process.env;
-
+const {
+  NEXT_PUBLIC_GISCUS_REPO,
+  NEXT_PUBLIC_GISCUS_REPO_ID,
+  NEXT_PUBLIC_GISCUS_CATEGORY,
+  NEXT_PUBLIC_GISCUS_CATEGORY_ID,
+} = process.env;
   return (
     <article>
       <header className="mb-6">
@@ -22,12 +26,12 @@ const PostContent = async ({ post }: { post: Awaited<ReturnType<typeof getPostBy
       <MarkdownRenderer content={post.content} />
 
       {/* comments */}
-      {GISCUS_REPO && GISCUS_REPO_ID && GISCUS_CATEGORY && GISCUS_CATEGORY_ID ? (
+      {NEXT_PUBLIC_GISCUS_REPO && NEXT_PUBLIC_GISCUS_REPO_ID && NEXT_PUBLIC_GISCUS_CATEGORY && NEXT_PUBLIC_GISCUS_CATEGORY_ID ? (
         <Giscus
-          repo={GISCUS_REPO}
-          repoId={GISCUS_REPO_ID}
-          category={GISCUS_CATEGORY}
-          categoryId={GISCUS_CATEGORY_ID}
+          repo={NEXT_PUBLIC_GISCUS_REPO}
+          repoId={NEXT_PUBLIC_GISCUS_REPO_ID}
+          category={NEXT_PUBLIC_GISCUS_CATEGORY}
+          categoryId={NEXT_PUBLIC_GISCUS_CATEGORY_ID}
         />
       ) : (
         <div className="mt-8 text-sm text-slate-500">
