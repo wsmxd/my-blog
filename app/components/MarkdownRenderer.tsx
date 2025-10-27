@@ -2,7 +2,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import rehypeSanitize from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -20,7 +20,19 @@ export default function MarkdownRenderer({ content }: { content: string }) {
     <article className="prose prose-slate dark:prose-invert max-w-none">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSanitize]}
+        rehypePlugins={[
+          [
+            rehypeSanitize,
+            {
+              ...defaultSchema,
+              attributes: {
+                ...defaultSchema.attributes,
+                code: [...(defaultSchema.attributes?.code || []), "className"],
+                pre:  [...(defaultSchema.attributes?.pre  || []), "className"],
+              },
+            },
+          ],
+        ]}
         components={{
           code({ inline, className, children }: CodeRendererProps) {
             const match = /language-(\w+)/.exec(className || "");
@@ -35,12 +47,7 @@ export default function MarkdownRenderer({ content }: { content: string }) {
                 </SyntaxHighlighter>
               );
             }
-
-            return (
-              <code className={className}>
-                {children}
-              </code>
-            );
+            return <code className={className}>{children}</code>;
           },
         }}
       >
