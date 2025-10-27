@@ -79,7 +79,9 @@ export async function getPostBySlug(slug: string): Promise<Post> {
     const matter = (await import('gray-matter')).default;
 
     const postsDir = path.join(process.cwd(), 'posts');
-    const filePath = path.join(postsDir, `${slug}.md`);
+    // Decode URI encoded slugs (e.g. "avalonia%20bindings" -> "avalonia bindings")
+    const decodedSlug = decodeURIComponent(slug);
+    const filePath = path.join(postsDir, `${decodedSlug}.md`);
     if (!fs.existsSync(filePath)) {
       throw new Error(`Post not found: ${slug}`);
     }
