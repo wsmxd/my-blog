@@ -42,3 +42,72 @@ body {
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(15,23,42,0.06);
 }
+
+.markdown-body {
+  line-height: 1.7;
+  color: var(--foreground); /* 统一使用系统前景色 */
+}
+
+/* 标题只控制大小和间距，颜色继承 */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+}
+
+.markdown-body h1 { font-size: 2.25rem; line-height: 2.5rem; margin-top: 2.5em; margin-bottom: 1em; }
+.markdown-body h2 { font-size: 1.875rem; line-height: 2.25rem; margin-top: 2em; margin-bottom: 1em; }
+.markdown-body h3 { font-size: 1.5rem; line-height: 2rem; margin-top: 1.75em; margin-bottom: 0.75em; }
+.markdown-body h4 { font-size: 1.25rem; line-height: 1.75rem; margin-top: 1.5em; margin-bottom: 0.5em; }
+.markdown-body h5 { font-size: 1.125rem; line-height: 1.75rem; margin-top: 1.25em; margin-bottom: 0.5em; }
+.markdown-body h6 { font-size: 1rem; line-height: 1.5rem; margin-top: 1em; margin-bottom: 0.5em; }
+
+/* 其他样式保持不变（列表、段落等） */
+
+.markdown-body p {
+  margin-bottom: 1em;
+}
+
+.markdown-body strong {
+  font-weight: 600;
+}
+
+.markdown-body em {
+  font-style: italic;
+}
+
+.markdown-body del {
+  text-decoration: line-through;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 1.5em;
+  margin-bottom: 1em;
+}
+.markdown-body ul li,
+.markdown-body ol li {
+  margin-bottom: 0.4em;
+}
+.markdown-body ul {
+  list-style-type: disc;
+}
+.markdown-body ol {
+  list-style-type: decimal;
+}
+
+/* 链接可以保留强调色，或也用 var(--foreground) */
+.markdown-body a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+@media (prefers-color-scheme: dark) {
+  .markdown-body a {
+    color: #93c5fd;
+  }
+}

@@ -17,7 +17,8 @@ const syntaxTheme = oneDark as unknown as { [key: string]: React.CSSProperties }
 
 export default function MarkdownRenderer({ content }: { content: string }) {
   return (
-    <article className="prose prose-slate dark:prose-invert max-w-none">
+    // prose prose-slate dark:prose-invert这些样式会导致在浏览器中内容显示被限制在了一定的宽度，而导致右边有很多空白
+    <article className="markdown-body max-w-none">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
