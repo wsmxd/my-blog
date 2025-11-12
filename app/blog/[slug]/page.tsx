@@ -17,7 +17,7 @@ const {
   NEXT_PUBLIC_GISCUS_CATEGORY_ID,
 } = process.env;
   return (
-    <article>
+    <article className="pt-12">
       <header className="mb-6">
         <h1 className="text-3xl font-bold">{post.meta.title}</h1>
         <p className="text-sm text-slate-500 mt-1">{post.meta.date}</p>
