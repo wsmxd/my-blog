@@ -24,7 +24,7 @@ export default function HomePage() {
           {/* 头像/logo */}
           <div className="flex justify-center">
             <div className="w-24 h-24 bg-linear-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-              王
+              mxd
             </div>
           </div>
 
