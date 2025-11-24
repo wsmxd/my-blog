@@ -1,37 +1,36 @@
-'use client'
-
 import Link from "next/link";
-import { motion } from 'framer-motion';
 import FlowingGradient from './components/FlowingGradient'; // 或 DynamicBackground
+import AnimatedSection from './components/AnimatedSection';
+import { getAllPosts } from '../lib/posts';
+import { getTotalReads } from '../lib/reads';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const posts = await getAllPosts();
+  const postsCount = posts.length;
+  const totalReads = await getTotalReads();
+
   return (
     <>
       {/* 动态背景 */}
       <FlowingGradient />
 
-      {/* 内容区域：半透明 + 淡入 */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: 'easeOut' }}
-        className="min-h-screen flex items-center justify-center"
-      >
+      {/* 内容区域：半透明 + 淡入 （动画在客户端执行） */}
+      <AnimatedSection className="min-h-screen flex items-center justify-center">
         <section className="text-center space-y-8 max-w-2xl mx-auto px-6 relative z-10">
           {/* 卡片底板：半透明磨砂 */}
-          <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-xl rounded-2xl -z-10"></div>
+          {/* <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-xl rounded-2xl -z-10"></div> */}
 
           {/* 头像/logo */}
-          <div className="flex justify-center">
+          {/* <div className="flex justify-center">
             <div className="w-24 h-24 bg-linear-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
               mxd
             </div>
-          </div>
+          </div> */}
 
           {/* 主标题 */}
           <div className="space-y-4">
             <h1 className="text-5xl font-bold bg-linear-to-r from-slate-200 to-blue-300 bg-clip-text text-transparent">
-              欢迎来到我的博客
+              欢迎来到马晓东的博客
             </h1>
             <p className="text-xl text-slate-300 leading-relaxed">
               这是一个基于 <span className="font-semibold text-blue-300">Next.js</span> 和{" "}
@@ -62,23 +61,19 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* 统计数据 */}
-          <div className="flex justify-center gap-8 pt-8 text-slate-400">
+          {/* 统计数据（服务端渲染，利于 SEO） */}
+          <div className="flex justify-center gap-8 pt-4 text-slate-400">
             <div className="text-center">
-              <div className="text-2xl font-bold text-slate-300">12+</div>
-              <div className="text-sm">技术文章</div>
+              <div className="text-2xl font-bold text-slate-300">{postsCount}</div>
+              <div className="text-sm">博客文章</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-slate-300">3K+</div>
+              <div className="text-2xl font-bold text-slate-300">{totalReads}</div>
               <div className="text-sm">阅读量</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-slate-300">24+</div>
-              <div className="text-sm">项目分享</div>
             </div>
           </div>
         </section>
-      </motion.div>
+      </AnimatedSection>
     </>
   );
 }

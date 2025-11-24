@@ -8,6 +8,7 @@ type Props = {
 };
 
 import { ErrorBoundary } from "../../components/ErrorBoundary";
+import ClientEntry from "./ClientEntry";
 
 const PostContent = async ({ post }: { post: Awaited<ReturnType<typeof getPostBySlug>> }) => {
 const {
@@ -64,6 +65,8 @@ export default async function PostPage({ params }: Props) {
   return (
     <ErrorBoundary>
       <PostContent post={post} />
+      {/* client-only: trigger read increment */}
+      <ClientEntry slug={resolvedParams.slug} />
     </ErrorBoundary>
   );
 }

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import type { Post } from '../../lib/posts';
 
 interface BlogListClientProps {
@@ -11,6 +12,27 @@ interface BlogListClientProps {
 }
 
 export default function BlogListClient({ posts }: BlogListClientProps) {
+  const [reads, setReads] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    let mounted = true;
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/stats');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        setReads(data.perPost || {});
+      } catch (err) {
+        // ignore
+        console.error(err);
+      }
+    }
+    fetchStats();
+    const id = setInterval(fetchStats, 30_000);
+    return () => { mounted = false; clearInterval(id); };
+  }, []);
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {posts.map((post, index) => (
@@ -44,8 +66,28 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
           <p className="text-slate-300 text-sm leading-relaxed mb-4">
             {post.meta.description || '暂无描述'}
           </p>
-          <div className="flex items-center text-sm text-blue-400 hover:text-blue-300 transition-colors">
-            <Link href={`/blog/${post.slug}`}>阅读更多 →</Link>
+          <div className="flex items-center justify-between text-sm">
+            <div className="text-blue-400 hover:text-blue-300 transition-colors">
+              <Link
+                href={`/blog/${post.slug}`}
+                onClick={(_) => {
+                  // fire-and-forget increment; use keepalive so navigation won't cancel it
+                  try {
+                    fetch(`/api/read/${encodeURIComponent(post.slug)}`, {
+                      method: 'POST',
+                      body: JSON.stringify({ count: 1 }),
+                      headers: { 'Content-Type': 'application/json' },
+                      keepalive: true,
+                    });
+                  } catch {}
+                }}
+              >
+                阅读更多 →
+              </Link>
+            </div>
+            <div className="text-slate-400 text-sm">
+              阅读量： <span className="font-semibold text-slate-200">{reads[post.slug] ?? '—'}</span>
+            </div>
           </div>
         </motion.article>
       ))}
