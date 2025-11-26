@@ -1,4 +1,3 @@
-
 @import "tailwindcss";
 
 :root {
@@ -110,4 +109,24 @@ body {
   .markdown-body a {
     color: #93c5fd;
   }
+}
+
+@keyframes shooting-star {
+  0% {
+    /* 初始状态：在右上角，可见 */
+    transform: translateX(0) translateY(0) rotate(45deg);
+    opacity: 1;
+  }
+  100% {
+    /* 结束状态：向左下方移动很远的距离，消失 */
+    transform: translateX(-150vh) translateY(150vh) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+.animate-shooting-star {
+  /* 调整时间为 3s，更像流星划过；infinite 表示循环播放 */
+  animation: shooting-star 3s ease-out infinite;
+  /* 初始延迟 */
+  animation-delay: 1s; 
 }
