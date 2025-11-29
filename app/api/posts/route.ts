@@ -9,6 +9,7 @@ export type PostMeta = {
   description?: string;
   tags?: string[];
   cover?: string;
+  category?: string;
 };
 
 const postsDir = path.join(process.cwd(), "posts");
@@ -39,8 +40,11 @@ function getPostBySlug(slug: string) {
   };
 }
 
-export async function GET() {
-  const posts = getPostSlugs()
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const category = searchParams.get('category');
+  
+  let posts = getPostSlugs()
     .map((slug) => {
       const p = getPostBySlug(slug);
       // ensure default cover if missing and normalize
@@ -60,6 +64,11 @@ export async function GET() {
       const db = b.meta.date || "";
       return db.localeCompare(da);
     });
+
+  // Filter by category if specified
+  if (category) {
+    posts = posts.filter(post => post.meta.category === category);
+  }
 
   return NextResponse.json(posts);
 }

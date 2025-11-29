@@ -4,6 +4,7 @@ export type PostMeta = {
   description?: string;
   tags?: string[];
   cover?: string;
+  category?: string;
 };
 
 export type Post = {
@@ -23,7 +24,7 @@ const getBaseUrl = () => {
 };
 
 // On server: read files directly (more reliable). On client: call API.
-export async function getAllPosts(): Promise<Post[]> {
+export async function getAllPosts(category?: string): Promise<Post[]> {
   if (typeof window === 'undefined') {
     // Server-side: use fs to read markdown files directly
     const fs = await import('fs');
@@ -34,7 +35,7 @@ export async function getAllPosts(): Promise<Post[]> {
     if (!fs.existsSync(postsDir)) return [];
 
     const slugs = fs.readdirSync(postsDir).filter((f: string) => f.endsWith('.md'));
-    const posts = slugs
+    let posts = slugs
       .map((slug: string) => {
         const realSlug = slug.replace(/\.md$/, '');
         const fullPath = path.join(postsDir, slug);
@@ -62,12 +63,18 @@ export async function getAllPosts(): Promise<Post[]> {
         return db.localeCompare(da);
       });
 
+    // Filter by category if specified
+    if (category) {
+      posts = posts.filter(post => post.meta.category === category);
+    }
+
     return posts;
   }
 
   // Client-side: fetch from API
   const baseUrl = getBaseUrl();
-  const resp = await fetch(`${baseUrl}/api/posts`, { next: { revalidate: 60 } });
+  const url = category ? `${baseUrl}/api/posts?category=${encodeURIComponent(category)}` : `${baseUrl}/api/posts`;
+  const resp = await fetch(url, { next: { revalidate: 60 } });
   if (!resp.ok) throw new Error('Failed to fetch posts');
   return resp.json();
 }

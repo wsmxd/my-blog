@@ -4,6 +4,7 @@ date: "2025-10-27"
 description: "详解在 Avalonia 的 ItemsControl.ItemTemplate 中如何正确绑定到外层 ViewModel（如 MainViewModel）的属性或命令，并澄清编译绑定（Compiled Bindings）下的实际限制。"
 tags: ["Avalonia", "XAML", "数据绑定", "MVVM"]
 cover: "/images/default-cover.svg"
+category: "professional"
 ---
 
 # 前言

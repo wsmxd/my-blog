@@ -12,7 +12,7 @@ export default function Header() {
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50"
     >
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         {/* 头像链接 */}
         <Link href="/about" className="block">
           <motion.div
@@ -41,7 +41,7 @@ export default function Header() {
             博客
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
           </Link>
-          <a
+          <Link
             href="https://github.com/wsmxd/my-blog"
             target="_blank"
             rel="noopener noreferrer"
@@ -49,7 +49,7 @@ export default function Header() {
           >
             GitHub
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
-          </a>
+          </Link>
         </nav>
       </div>
     </motion.header>
