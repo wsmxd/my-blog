@@ -11,8 +11,19 @@ interface BlogListClientProps {
   // 或直接用：posts: Post[];
 }
 
+const POSTS_PER_PAGE = 6; // 每页显示的文章数量
+
 export default function BlogListClient({ posts }: BlogListClientProps) {
   const [reads, setReads] = useState<Record<string, number>>({});
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // 计算总页数
+  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+  
+  // 获取当前页的文章
+  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const endIndex = startIndex + POSTS_PER_PAGE;
+  const currentPosts = posts.slice(startIndex, endIndex);
 
   useEffect(() => {
     let mounted = true;
@@ -33,64 +44,150 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
     return () => { mounted = false; clearInterval(id); };
   }, []);
 
+  // 当文章列表变化时重置到第一页
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [posts]);
+
+  // 分页按钮点击处理
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // 滚动到页面顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      {posts.map((post, index) => (
-        <motion.article
+    <>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+        {currentPosts.map((post, index) => (
+        <Link
           key={post.slug}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{
-            duration: 0.4,
-            delay: index * 0.1,
-            ease: 'easeOut',
+          href={`/blog/${post.slug}`}
+          onClick={(_) => {
+            try {
+              fetch(`/api/read/${encodeURIComponent(post.slug)}`, {
+                method: 'POST',
+                body: JSON.stringify({ count: 1 }),
+                headers: { 'Content-Type': 'application/json' },
+                keepalive: true,
+              });
+            } catch {}
           }}
-          className="group relative p-6 border border-slate-700/50 rounded-xl bg-slate-900/70 backdrop-blur-sm hover:bg-slate-900/80 transition-all duration-300 shadow-lg hover:shadow-xl"
         >
-          <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
-            <Image
-              src={post.meta.cover || '/images/default-cover.svg'}
-              alt={post.meta.title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          </div>
-          <h2 className="text-xl font-semibold text-slate-100 mb-2">
-            <Link href={`/blog/${post.slug}`} className="hover:text-blue-400 transition-colors">
-              {post.meta.title}
-            </Link>
-          </h2>
-          <p className="text-sm text-slate-400 mb-3">
-            {post.meta.date || '日期未知'}
-          </p>
-          <p className="text-slate-300 text-sm leading-relaxed mb-4">
-            {post.meta.description || '暂无描述'}
-          </p>
-          <div className="flex items-center justify-between text-sm">
-            <div className="text-blue-400 hover:text-blue-300 transition-colors">
-              <Link
-                href={`/blog/${post.slug}`}
-                onClick={(_) => {
-                  // fire-and-forget increment; use keepalive so navigation won't cancel it
-                  try {
-                    fetch(`/api/read/${encodeURIComponent(post.slug)}`, {
-                      method: 'POST',
-                      body: JSON.stringify({ count: 1 }),
-                      headers: { 'Content-Type': 'application/json' },
-                      keepalive: true,
-                    });
-                  } catch {}
-                }}
+          <motion.article
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.4,
+              delay: index * 0.1,
+              ease: 'easeOut',
+            }}
+            whileHover={{ 
+              y: -8,
+              transition: { duration: 0.3, ease: 'easeOut' }
+            }}
+            className="group relative p-6 border border-slate-700/50 rounded-2xl bg-slate-900/80 backdrop-blur-md shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
+          >
+            {/* 悬停时的光晕效果 */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/5 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            
+            <div className="relative w-full h-48 mb-4 rounded-xl overflow-hidden bg-gradient-to-br from-blue-900/20 to-purple-900/20">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+                className="w-full h-full"
               >
-                阅读更多 →
-              </Link>
+                <Image
+                  src={post.meta.cover || '/images/default-cover.svg'}
+                  alt={post.meta.title}
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
             </div>
-            <div className="text-slate-400 text-sm">
-              阅读量： <span className="font-semibold text-slate-200">{reads[post.slug] ?? '—'}</span>
+            
+            <h2 className="text-xl font-semibold text-slate-100 mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors duration-[800ms]">
+              {post.meta.title}
+            </h2>
+            
+            <p className="text-sm text-slate-400 mb-3 flex items-center gap-1">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {post.meta.date || '日期未知'}
+            </p>
+            
+            <p className="text-slate-300 text-sm leading-relaxed mb-4 line-clamp-3">
+              {post.meta.description || '暂无描述'}
+            </p>
+            
+            <div className="flex items-center justify-end text-sm pt-4 border-t border-slate-700">
+              <div className="text-slate-400 text-sm flex items-center gap-1">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <span className="font-semibold text-slate-200">{reads[post.slug] ?? '—'}</span>
+              </div>
             </div>
+          </motion.article>
+        </Link>
+        ))}
+      </div>
+      
+      {/* 分页按钮 - 只在文章数量大于6时显示 */}
+      {posts.length > POSTS_PER_PAGE && (
+        <div className="flex justify-center items-center gap-2 mt-10">
+          {/* 上一页按钮 */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+              currentPage === 1
+                ? 'bg-slate-800/40 text-slate-600 cursor-not-allowed'
+                : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/80 border border-slate-600/30'
+            }`}
+          >
+            ← 上一页
+          </motion.button>
+
+          {/* 页码按钮 */}
+          <div className="flex gap-2">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <motion.button
+                key={page}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handlePageChange(page)}
+                className={`w-10 h-10 rounded-lg font-semibold transition-all duration-300 ${
+                  currentPage === page
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                    : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/80 border border-slate-600/30'
+                }`}
+              >
+                {page}
+              </motion.button>
+            ))}
           </div>
-        </motion.article>
-      ))}
-    </div>
+
+          {/* 下一页按钮 */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
+              currentPage === totalPages
+                ? 'bg-slate-800/40 text-slate-600 cursor-not-allowed'
+                : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/80 border border-slate-600/30'
+            }`}
+          >
+            下一页 →
+          </motion.button>
+        </div>
+      )}
+    </>
   );
 }

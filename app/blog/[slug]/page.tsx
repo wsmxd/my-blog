@@ -18,27 +18,48 @@ const {
   NEXT_PUBLIC_GISCUS_CATEGORY_ID,
 } = process.env;
   return (
-    <article className="pt-12">
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold">{post.meta.title}</h1>
-        <p className="text-sm text-slate-500 mt-1">{post.meta.date}</p>
+    <article className="pt-12 max-w-4xl mx-auto relative">
+      {/* 背景装饰 */}
+      <div className="absolute -top-20 -right-20 w-72 h-72 bg-purple-900/10 rounded-full blur-3xl" />
+      <div className="absolute top-40 -left-20 w-96 h-96 bg-blue-900/10 rounded-full blur-3xl" />
+      
+      <header className="mb-8 pb-6 border-b border-slate-700/50 relative">
+        <h1 className="text-4xl sm:text-5xl font-bold mb-3 bg-gradient-to-r from-slate-100 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">
+          {post.meta.title}
+        </h1>
+        <p className="text-sm sm:text-base text-slate-400 mt-2 flex items-center gap-2">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          {post.meta.date}
+        </p>
       </header>
 
-      <MarkdownRenderer content={post.content} />
+      <div className="prose-container bg-slate-900/50 rounded-3xl p-6 sm:p-8 lg:p-12 shadow-xl backdrop-blur-lg border border-slate-700/30 relative overflow-hidden">
+        {/* 内容区装饰效果 */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl" />
+        <div className="relative">
+          <MarkdownRenderer content={post.content} />
+        </div>
+      </div>
 
       {/* comments */}
-      {NEXT_PUBLIC_GISCUS_REPO && NEXT_PUBLIC_GISCUS_REPO_ID && NEXT_PUBLIC_GISCUS_CATEGORY && NEXT_PUBLIC_GISCUS_CATEGORY_ID ? (
-        <Giscus
-          repo={NEXT_PUBLIC_GISCUS_REPO}
-          repoId={NEXT_PUBLIC_GISCUS_REPO_ID}
-          category={NEXT_PUBLIC_GISCUS_CATEGORY}
-          categoryId={NEXT_PUBLIC_GISCUS_CATEGORY_ID}
-        />
-      ) : (
-        <div className="mt-8 text-sm text-slate-500">
-          请在环境变量中配置 Giscus 相关信息以启用评论。
-        </div>
-      )}
+      <div className="mt-12">
+        {NEXT_PUBLIC_GISCUS_REPO && NEXT_PUBLIC_GISCUS_REPO_ID && NEXT_PUBLIC_GISCUS_CATEGORY && NEXT_PUBLIC_GISCUS_CATEGORY_ID ? (
+          <div className="bg-slate-900/50 rounded-3xl p-6 backdrop-blur-lg border border-slate-700/30">
+            <Giscus
+              repo={NEXT_PUBLIC_GISCUS_REPO}
+              repoId={NEXT_PUBLIC_GISCUS_REPO_ID}
+              category={NEXT_PUBLIC_GISCUS_CATEGORY}
+              categoryId={NEXT_PUBLIC_GISCUS_CATEGORY_ID}
+            />
+          </div>
+        ) : (
+          <div className="mt-8 text-sm text-slate-400 text-center p-8 bg-slate-800/50 rounded-3xl backdrop-blur-sm">
+            请在环境变量中配置 Giscus 相关信息以启用评论。
+          </div>
+        )}
+      </div>
     </article>
   );
 };

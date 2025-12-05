@@ -31,14 +31,18 @@ export default async function BlogIndex({ searchParams }: { searchParams: Promis
   const isActive = (category: string | null) => selectedCategory === category;
 
   return (
-    <section className="space-y-6 pt-16 px-4 sm:px-6">
-      <div className="mb-8 flex flex-wrap justify-center gap-2 sm:gap-4">
+    <section className="space-y-6 pt-16 px-4 sm:px-6 relative">
+      {/* 背景装饰 */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-900/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-900/5 rounded-full blur-3xl" />
+      
+      <div className="mb-8 flex flex-wrap justify-center gap-3 relative z-10">
         <Link
           href="/blog"
-          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+          className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
             !selectedCategory
-              ? 'bg-blue-600 text-white'
-              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
+              : 'bg-slate-800/70 text-slate-300 hover:bg-slate-800/90 border-2 border-slate-600/30 backdrop-blur-md'
           }`}
           prefetch={false}
         >
@@ -46,10 +50,10 @@ export default async function BlogIndex({ searchParams }: { searchParams: Promis
         </Link>
         <Link
           href="/blog?category=professional"
-          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+          className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
             isActive('professional')
-              ? 'bg-blue-600 text-white'
-              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
+              : 'bg-slate-800/70 text-slate-300 hover:bg-slate-800/90 border-2 border-slate-600/30 backdrop-blur-md'
           }`}
           prefetch={false}
         >
@@ -57,10 +61,10 @@ export default async function BlogIndex({ searchParams }: { searchParams: Promis
         </Link>
         <Link
           href="/blog?category=daily"
-          className={`px-4 py-2 rounded-lg transition-colors whitespace-nowrap ${
+          className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
             isActive('daily')
-              ? 'bg-blue-600 text-white'
-              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
+              : 'bg-slate-800/70 text-slate-300 hover:bg-slate-800/90 border-2 border-slate-600/30 backdrop-blur-md'
           }`}
           prefetch={false}
         >
@@ -69,7 +73,7 @@ export default async function BlogIndex({ searchParams }: { searchParams: Promis
       </div>
 
       {/* 可选：加载骨架屏（如果需要） */}
-      <Suspense fallback={<div>加载中...</div>}>
+      <Suspense fallback={<div className="text-center text-slate-400">加载中...</div>}>
         <BlogListClient posts={posts} />
       </Suspense>
     </section>

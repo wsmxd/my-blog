@@ -2,7 +2,16 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1e293b;
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(226, 232, 240, 0.5);
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+  --card-bg: rgba(30, 41, 59, 0.6);
+  --card-border: rgba(71, 85, 105, 0.3);
 }
 
 @theme inline {
@@ -13,10 +22,16 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not(.dark):not(.light) {
+    --background: #0f172a;
+    --foreground: #e2e8f0;
+    --card-bg: rgba(30, 41, 59, 0.6);
+    --card-border: rgba(71, 85, 105, 0.3);
   }
+}
+
+html {
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 html, body, #__next {
@@ -26,9 +41,17 @@ html, body, #__next {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* 主题切换通用过渡动画 */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.5s;
 }
 
 /* Markdown / prose styles (requires @tailwindcss/typography plugin to look best) */
@@ -37,14 +60,32 @@ body {
 }
 
 .card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,250,250,0.6));
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  transition: all 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .card {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.dark .card:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
 .markdown-body {
-  line-height: 1.7;
-  color: var(--foreground); /* 统一使用系统前景色 */
+  line-height: 1.8;
+  color: var(--foreground);
+  font-size: 1.0625rem;
+  transition: color 0.5s ease;
 }
 
 /* 标题只控制大小和间距，颜色继承 */
@@ -54,22 +95,84 @@ body {
 .markdown-body h4,
 .markdown-body h5,
 .markdown-body h6 {
-  font-weight: 600;
-  margin-top: 1.5em;
+  font-weight: 700;
+  margin-top: 1.8em;
   margin-bottom: 0.8em;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+  transition: color 0.5s ease, border-color 0.5s ease;
 }
 
-.markdown-body h1 { font-size: 2.25rem; line-height: 2.5rem; margin-top: 2.5em; margin-bottom: 1em; }
-.markdown-body h2 { font-size: 1.875rem; line-height: 2.25rem; margin-top: 2em; margin-bottom: 1em; }
-.markdown-body h3 { font-size: 1.5rem; line-height: 2rem; margin-top: 1.75em; margin-bottom: 0.75em; }
-.markdown-body h4 { font-size: 1.25rem; line-height: 1.75rem; margin-top: 1.5em; margin-bottom: 0.5em; }
-.markdown-body h5 { font-size: 1.125rem; line-height: 1.75rem; margin-top: 1.25em; margin-bottom: 0.5em; }
-.markdown-body h6 { font-size: 1rem; line-height: 1.5rem; margin-top: 1em; margin-bottom: 0.5em; }
+.markdown-body h1 { 
+  font-size: 2.5rem; 
+  line-height: 2.75rem; 
+  margin-top: 3em; 
+  margin-bottom: 1.2em;
+  padding-bottom: 0.5em;
+  border-bottom: 2px solid rgba(148, 163, 184, 0.2);
+}
+.markdown-body h2 { 
+  font-size: 2rem; 
+  line-height: 2.5rem; 
+  margin-top: 2.5em; 
+  margin-bottom: 1em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+.markdown-body h3 { 
+  font-size: 1.625rem; 
+  line-height: 2.25rem; 
+  margin-top: 2em; 
+  margin-bottom: 0.75em; 
+}
+.markdown-body h4 { 
+  font-size: 1.375rem; 
+  line-height: 2rem; 
+  margin-top: 1.75em; 
+  margin-bottom: 0.5em; 
+}
+.markdown-body h5 { 
+  font-size: 1.125rem; 
+  line-height: 1.75rem; 
+  margin-top: 1.5em; 
+  margin-bottom: 0.5em; 
+}
+.markdown-body h6 { 
+  font-size: 1rem; 
+  line-height: 1.5rem; 
+  margin-top: 1.25em; 
+  margin-bottom: 0.5em; 
+}
 
 /* 其他样式保持不变（列表、段落等） */
 
 .markdown-body p {
-  margin-bottom: 1em;
+  margin-bottom: 1.25em;
+  line-height: 1.8;
+}
+
+.markdown-body code {
+  background: rgba(148, 163, 184, 0.15);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: var(--font-geist-mono), monospace;
+  transition: background-color 0.5s ease;
+}
+
+.dark .markdown-body code {
+  background: rgba(100, 116, 139, 0.25);
+}
+
+.markdown-body pre {
+  margin: 1.5em 0;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.markdown-body pre code {
+  background: transparent;
+  padding: 0;
 }
 
 .markdown-body strong {
@@ -84,14 +187,29 @@ body {
   text-decoration: line-through;
 }
 
+.markdown-body blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1em;
+  margin: 1.5em 0;
+  color: #64748b;
+  font-style: italic;
+  transition: color 0.5s ease, border-color 0.5s ease;
+}
+
+.dark .markdown-body blockquote {
+  color: #94a3b8;
+  border-left-color: #60a5fa;
+}
+
 .markdown-body ul,
 .markdown-body ol {
-  padding-left: 1.5em;
-  margin-bottom: 1em;
+  padding-left: 1.75em;
+  margin-bottom: 1.25em;
 }
 .markdown-body ul li,
 .markdown-body ol li {
-  margin-bottom: 0.4em;
+  margin-bottom: 0.5em;
+  line-height: 1.7;
 }
 .markdown-body ul {
   list-style-type: disc;
@@ -103,12 +221,24 @@ body {
 /* 链接可以保留强调色，或也用 var(--foreground) */
 .markdown-body a {
   color: #3b82f6;
-  text-decoration: underline;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
 }
-@media (prefers-color-scheme: dark) {
-  .markdown-body a {
-    color: #93c5fd;
-  }
+
+.markdown-body a:hover {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+.dark .markdown-body a {
+  color: #60a5fa;
+  border-bottom-color: rgba(96, 165, 250, 0.3);
+}
+
+.dark .markdown-body a:hover {
+  color: #93c5fd;
+  border-bottom-color: #93c5fd;
 }
 
 @keyframes shooting-star {
@@ -129,4 +259,85 @@ body {
   animation: shooting-star 3s ease-out infinite;
   /* 初始延迟 */
   animation-delay: 1s; 
+}
+
+/* Blob 动画 */
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -50px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  75% {
+    transform: translate(50px, 50px) scale(1.05);
+  }
+}
+
+.animate-blob {
+  animation: blob 20s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* 自定义滚动条样式 */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.3);
+  border-radius: 5px;
+  transition: background-color 0.5s ease;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.5);
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+/* 响应式优化 */
+@media (max-width: 640px) {
+  .markdown-body h1 { font-size: 2rem; }
+  .markdown-body h2 { font-size: 1.75rem; }
+  .markdown-body h3 { font-size: 1.5rem; }
+  .markdown-body { font-size: 1rem; }
+}
+
+/* 动画优化 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

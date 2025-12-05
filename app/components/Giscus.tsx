@@ -10,10 +10,14 @@ type GiscusProps = {
 };
 
 export default function Giscus({ repo, repoId, category, categoryId, mapping = "pathname" }: GiscusProps) {
+  
   useEffect(() => {
   if (!repo || !repoId || !category || !categoryId) return;
   const container = document.getElementById("giscus-container");
   if (!container) return;
+
+  // 清除之前的 giscus
+  container.innerHTML = "";
 
   const script = document.createElement("script");
   script.src = "https://giscus.app/client.js";
@@ -27,7 +31,7 @@ export default function Giscus({ repo, repoId, category, categoryId, mapping = "
   script.setAttribute("data-reactions-enabled", "1");
   script.setAttribute("data-emit-metadata", "0");
   script.setAttribute("data-input-position", "top");
-  script.setAttribute("data-theme", "preferred_color_scheme");
+  script.setAttribute("data-theme", 'dark');
   script.setAttribute("data-lang", "zh-CN");
   script.setAttribute("data-loading", "lazy");
   script.setAttribute("data-strict", "0");
@@ -39,5 +43,5 @@ export default function Giscus({ repo, repoId, category, categoryId, mapping = "
   };
 }, [repo, repoId, category, categoryId, mapping]);
 
-  return <div id="giscus-container" className="mt-10" />;
+  return <div id="giscus-container" className="mt-10 rounded-xl overflow-hidden" />;
 }
