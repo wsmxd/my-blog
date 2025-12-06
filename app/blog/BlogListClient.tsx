@@ -46,6 +46,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
 
   // 当文章列表变化时重置到第一页
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [posts]);
 
@@ -89,9 +90,9 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
             className="group relative p-6 border border-slate-700/50 rounded-2xl bg-slate-900/80 backdrop-blur-md shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
           >
             {/* 悬停时的光晕效果 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/5 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-linear-to-r from-blue-500/0 via-purple-500/5 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
-            <div className="relative w-full h-48 mb-4 rounded-xl overflow-hidden bg-gradient-to-br from-blue-900/20 to-purple-900/20">
+            <div className="relative w-full h-48 mb-4 rounded-xl overflow-hidden bg-linear-to-br from-blue-900/20 to-purple-900/20">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -106,7 +107,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
               </motion.div>
             </div>
             
-            <h2 className="text-xl font-semibold text-slate-100 mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors duration-[800ms]">
+            <h2 className="text-xl font-semibold text-slate-100 mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors duration-800">
               {post.meta.title}
             </h2>
             
@@ -163,7 +164,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
                 onClick={() => handlePageChange(page)}
                 className={`w-10 h-10 rounded-lg font-semibold transition-all duration-300 ${
                   currentPage === page
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                    ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg'
                     : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/80 border border-slate-600/30'
                 }`}
               >

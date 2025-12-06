@@ -24,7 +24,7 @@ const {
       <div className="absolute top-40 -left-20 w-96 h-96 bg-blue-900/10 rounded-full blur-3xl" />
       
       <header className="mb-8 pb-6 border-b border-slate-700/50 relative">
-        <h1 className="text-4xl sm:text-5xl font-bold mb-3 bg-gradient-to-r from-slate-100 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">
+        <h1 className="text-4xl sm:text-5xl font-bold mb-3 bg-linear-to-r from-slate-100 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">
           {post.meta.title}
         </h1>
         <p className="text-sm sm:text-base text-slate-400 mt-2 flex items-center gap-2">
@@ -37,7 +37,7 @@ const {
 
       <div className="prose-container bg-slate-900/50 rounded-3xl p-6 sm:p-8 lg:p-12 shadow-xl backdrop-blur-lg border border-slate-700/30 relative overflow-hidden">
         {/* 内容区装饰效果 */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl" />
         <div className="relative">
           <MarkdownRenderer content={post.content} />
         </div>

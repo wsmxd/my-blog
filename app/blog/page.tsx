@@ -41,7 +41,7 @@ export default async function BlogIndex({ searchParams }: { searchParams: Promis
           href="/blog"
           className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
             !selectedCategory
-              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
+              ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
               : 'bg-slate-800/70 text-slate-300 hover:bg-slate-800/90 border-2 border-slate-600/30 backdrop-blur-md'
           }`}
           prefetch={false}
@@ -52,7 +52,7 @@ export default async function BlogIndex({ searchParams }: { searchParams: Promis
           href="/blog?category=professional"
           className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
             isActive('professional')
-              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
+              ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
               : 'bg-slate-800/70 text-slate-300 hover:bg-slate-800/90 border-2 border-slate-600/30 backdrop-blur-md'
           }`}
           prefetch={false}
@@ -63,7 +63,7 @@ export default async function BlogIndex({ searchParams }: { searchParams: Promis
           href="/blog?category=daily"
           className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
             isActive('daily')
-              ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
+              ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
               : 'bg-slate-800/70 text-slate-300 hover:bg-slate-800/90 border-2 border-slate-600/30 backdrop-blur-md'
           }`}
           prefetch={false}
