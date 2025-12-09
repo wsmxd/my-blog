@@ -68,22 +68,28 @@ export default function AnimatedProfile({ profile, socialLinks }: AnimatedProfil
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.5 }}
         className="flex justify-center gap-4 flex-wrap"
       >
         {socialLinks.map((link) => {
           const Icon = IconMap[link.icon];
           return (
-            <Link
+            <motion.a
               key={link.name}
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_20px_-5px_rgba(66,153,225,0.4)]"
+              className="group relative p-3.5 rounded-xl bg-white/5 hover:bg-white/10
+                        border border-white/10 shadow-none"
               aria-label={link.name}
+              whileHover={{
+                y: -4,                           // 向上 4 px
+                boxShadow: '0 0 20px -5px rgba(66,153,225,0.4)',
+              }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }} // 弹性过渡
             >
-              <Icon className="w-5 h-5 text-slate-300 group-hover:text-blue-200 transition-colors" />
-            </Link>
+              <Icon className="w-5 h-5 text-slate-300 group-hover:text-blue-200 transition-colors duration-500" />
+            </motion.a>
           );
         })}
       </motion.div>

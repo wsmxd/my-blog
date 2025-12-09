@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import type { Post } from '../../lib/posts';
+import TagBadge from '../components/TagBadge';
 
 interface BlogListClientProps {
   posts: Pick<Post, 'slug' | 'meta'>[]; // 只需要 slug 和 meta，更精确（可选）
@@ -122,8 +123,11 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
               {post.meta.description || '暂无描述'}
             </p>
             
-            <div className="flex items-center justify-end text-sm pt-4 border-t border-slate-700">
-              <div className="text-slate-400 text-sm flex items-center gap-1">
+            <div className="flex items-center justify-between text-sm pt-4 border-t border-slate-700">
+              <div className="flex-1 mr-2">
+                <TagBadge tags={post.meta.tags} maxTags={3} />
+              </div>
+              <div className="text-slate-400 text-sm flex items-center gap-1 shrink-0">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
