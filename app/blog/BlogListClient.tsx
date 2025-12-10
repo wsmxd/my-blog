@@ -15,16 +15,22 @@ interface BlogListClientProps {
 const POSTS_PER_PAGE = 6; // 每页显示的文章数量
 
 export default function BlogListClient({ posts }: BlogListClientProps) {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [reads, setReads] = useState<Record<string, number>>({});
   const [currentPage, setCurrentPage] = useState(1);
 
+  // 根据分类筛选文章
+  const filteredPosts = selectedCategory 
+    ? posts.filter(post => post.meta.category === selectedCategory)
+    : posts;
+
   // 计算总页数
-  const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   
   // 获取当前页的文章
   const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
   const endIndex = startIndex + POSTS_PER_PAGE;
-  const currentPosts = posts.slice(startIndex, endIndex);
+  const currentPosts = filteredPosts.slice(startIndex, endIndex);
 
   useEffect(() => {
     let mounted = true;
@@ -45,11 +51,10 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
     return () => { mounted = false; clearInterval(id); };
   }, []);
 
-  // 当文章列表变化时重置到第一页
+  // 当文章列表或分类变化时重置到第一页
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
-  }, [posts]);
+  }, [selectedCategory]);
 
   // 分页按钮点击处理
   const handlePageChange = (page: number) => {
@@ -58,8 +63,55 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // 用于判断链接是否激活
+  const isActive = (category: string | null) => selectedCategory === category;
+
   return (
-    <>
+    <section className="space-y-6 pt-16 px-4 sm:px-6 relative">
+      {/* 背景装饰 */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-900/5 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-900/5 rounded-full blur-3xl" />
+      
+      {/* 分类筛选按钮 */}
+      <div className="mb-8 flex flex-wrap justify-center gap-3 relative z-10">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setSelectedCategory(null)}
+          className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
+            !selectedCategory
+              ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
+              : 'bg-slate-800/70 text-slate-300 hover:bg-slate-800/90 border-2 border-slate-600/30 backdrop-blur-md'
+          }`}
+        >
+          全部
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setSelectedCategory('professional')}
+          className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
+            isActive('professional')
+              ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
+              : 'bg-slate-800/70 text-slate-300 hover:bg-slate-800/90 border-2 border-slate-600/30 backdrop-blur-md'
+          }`}
+        >
+          专业文章
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setSelectedCategory('daily')}
+          className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
+            isActive('daily')
+              ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-xl scale-105'
+              : 'bg-slate-800/70 text-slate-300 hover:bg-slate-800/90 border-2 border-slate-600/30 backdrop-blur-md'
+          }`}
+        >
+          日常随笔
+        </motion.button>
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
         {currentPosts.map((post, index) => (
         <Link
@@ -141,7 +193,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
       </div>
       
       {/* 分页按钮 - 只在文章数量大于6时显示 */}
-      {posts.length > POSTS_PER_PAGE && (
+      {filteredPosts.length > POSTS_PER_PAGE && (
         <div className="flex justify-center items-center gap-2 mt-10">
           {/* 上一页按钮 */}
           <motion.button
@@ -193,6 +245,6 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
           </motion.button>
         </div>
       )}
-    </>
+    </section>
   );
 }

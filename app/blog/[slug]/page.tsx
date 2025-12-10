@@ -1,7 +1,11 @@
-import { getPostBySlug } from "../../../lib/posts";
+import { getPostBySlug, getAllPosts } from "../../../lib/posts";
 import MarkdownRenderer from "../../components/MarkdownRenderer";
 import Giscus from "../../components/Giscus";
 import { notFound } from "next/navigation";
+
+// 强制静态生成
+export const dynamic = 'force-static';
+export const revalidate = 3600; // 1小时重新验证一次
 
 type Props = {
   params: Promise<{ slug: string }> | { slug: string };
@@ -9,6 +13,14 @@ type Props = {
 
 import { ErrorBoundary } from "../../components/ErrorBoundary";
 import ClientEntry from "./ClientEntry";
+
+// 生成所有文章的静态路径
+export async function generateStaticParams() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
 
 const PostContent = async ({ post }: { post: Awaited<ReturnType<typeof getPostBySlug>> }) => {
 const {

@@ -20,9 +20,24 @@ export async function upstashIncr(key: string, amount = 1): Promise<number> {
 }
 
 export async function upstashGet(key: string): Promise<number> {
-  if (!redis) throw new Error('Upstash not configured');
-  const res = await redis.get(key);
-  return Number(res ?? 0);
+  const res = await fetch(
+    `${UPSTASH_URL}/get/${encodeURIComponent(key)}`,
+    {
+      headers: {
+        Authorization: `Bearer ${UPSTASH_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      next: { revalidate: 60 }, // 👈 关键：允许缓存 60 秒
+    }
+  );
+
+  if (!res.ok) {
+    console.error('Upstash get failed', await res.text());
+    return 0;
+  }
+
+  const data = await res.json();
+  return Number(data.result ?? 0);
 }
 
 export async function upstashMGet(keys: string[]): Promise<number[]> {
