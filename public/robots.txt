@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://wsmxd.top
+
+# Sitemaps
+Sitemap: https://wsmxd.top/sitemap.xml
