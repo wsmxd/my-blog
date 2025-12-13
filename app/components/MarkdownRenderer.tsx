@@ -1,10 +1,12 @@
 "use client";
 import React from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import CustomImg from "./CustomImg";
 
 type CodeRendererProps = {
   node?: unknown;
@@ -49,6 +51,11 @@ export default function MarkdownRenderer({ content }: { content: string }) {
               );
             }
             return <code className={className}>{children}</code>;
+          },
+          img({ src, alt }: { src?: string; alt?: string; width?: string | number; height?: string | number }) {
+            return (
+              CustomImg({ src, alt })
+            );
           },
         }}
       >

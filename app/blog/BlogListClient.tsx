@@ -27,8 +27,11 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
   // 计算总页数
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   
+  // 重置到第一页当分类改变时
+  const displayPage = currentPage > totalPages ? 1 : currentPage;
+  
   // 获取当前页的文章
-  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+  const startIndex = (displayPage - 1) * POSTS_PER_PAGE;
   const endIndex = startIndex + POSTS_PER_PAGE;
   const currentPosts = filteredPosts.slice(startIndex, endIndex);
 
@@ -51,13 +54,11 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
     return () => { mounted = false; clearInterval(id); };
   }, []);
 
-  // 当文章列表或分类变化时重置到第一页
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory]);
-
   // 分页按钮点击处理
   const handlePageChange = (page: number) => {
+    if (page === 1 && selectedCategory !== null) {
+      setSelectedCategory(null);
+    }
     setCurrentPage(page);
     // 滚动到页面顶部
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -199,8 +200,8 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
+            onClick={() => handlePageChange(displayPage - 1)}
+            disabled={displayPage === 1}
             className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
               currentPage === 1
                 ? 'bg-slate-800/40 text-slate-600 cursor-not-allowed'
@@ -219,7 +220,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handlePageChange(page)}
                 className={`w-10 h-10 rounded-lg font-semibold transition-all duration-300 ${
-                  currentPage === page
+                  displayPage === page
                     ? 'bg-linear-to-r from-blue-500 to-purple-500 text-white shadow-lg'
                     : 'bg-slate-800/70 text-slate-300 hover:bg-slate-700/80 border border-slate-600/30'
                 }`}
@@ -233,8 +234,8 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(displayPage + 1)}
+            disabled={displayPage === totalPages}
             className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
               currentPage === totalPages
                 ? 'bg-slate-800/40 text-slate-600 cursor-not-allowed'
