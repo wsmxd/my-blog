@@ -13,7 +13,7 @@ export default function HomeContent({ postsCount, totalReads }: HomeContentProps
     <section className="text-center space-y-8 max-w-2xl mx-auto px-6 relative z-10">
       {/* 主标题 */}
       <div className="space-y-4">
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-white via-blue-300 to-purple-300 bg-clip-text text-transparent drop-shadow-lg">
+        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-linear-to-r from-white via-blue-300 to-purple-300 bg-clip-text text-transparent drop-shadow-lg">
           欢迎来到马晓东的博客
         </h1>
         <p className="text-lg sm:text-xl text-slate-300 leading-relaxed font-medium">
@@ -52,10 +52,10 @@ export default function HomeContent({ postsCount, totalReads }: HomeContentProps
         >
           <Link
             href="/blog"
-            className="group inline-flex items-center gap-3 px-10 py-5 text-lg font-bold text-white bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 transition-all duration-300 shadow-2xl hover:shadow-purple-500/50 relative overflow-hidden"
+            className="group inline-flex items-center gap-3 px-10 py-5 text-lg font-bold text-white bg-linear-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 transition-all duration-300 shadow-2xl hover:shadow-purple-500/50 relative overflow-hidden"
           >
             {/* 按钮光晕效果 */}
-            <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+            <span className="absolute inset-0 bg-linear-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
             <span className="relative">查看博客文章</span>
             <motion.span
               className="relative text-xl"
@@ -76,7 +76,7 @@ export default function HomeContent({ postsCount, totalReads }: HomeContentProps
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
           className="text-center p-6 bg-slate-800/60 rounded-2xl backdrop-blur-lg border-2 border-slate-700/50 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/30 cursor-pointer transition-all duration-300 min-w-[140px]"
         >
-          <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">{postsCount}</div>
+          <div className="text-4xl font-bold bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">{postsCount}</div>
           <div className="text-sm mt-2 font-semibold text-slate-400">博客文章</div>
         </motion.div>
         <motion.div 
@@ -85,7 +85,7 @@ export default function HomeContent({ postsCount, totalReads }: HomeContentProps
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
           className="text-center p-6 bg-slate-800/60 rounded-2xl backdrop-blur-lg border-2 border-slate-700/50 hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/30 cursor-pointer transition-all duration-300 min-w-[140px]"
         >
-          <div className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{totalReads}</div>
+          <div className="text-4xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{totalReads}</div>
           <div className="text-sm mt-2 font-semibold text-slate-400">阅读量</div>
         </motion.div>
       </div>

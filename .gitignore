@@ -42,3 +42,5 @@ next-env.d.ts
 
 # 忽略 sitemap（由 postbuild 自动生成）
 /public/sitemap*.xml
+
+.qoder
