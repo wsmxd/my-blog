@@ -30,10 +30,11 @@ const {
   NEXT_PUBLIC_GISCUS_CATEGORY_ID,
 } = process.env;
   return (
-    <article className="pt-12 max-w-4xl mx-auto relative">
-      {/* 背景装饰 */}
-      <div className="absolute -top-20 -right-20 w-72 h-72 bg-purple-900/10 rounded-full blur-3xl" />
-      <div className="absolute top-40 -left-20 w-96 h-96 bg-blue-900/10 rounded-full blur-3xl" />
+    // 👇 添加 overflow-x-hidden w-full
+    <article className="pt-12 max-w-4xl mx-auto relative overflow-x-hidden w-full">
+      {/* 👇 背景装饰 - 添加 pointer-events-none 和 -z-10 */}
+      <div className="absolute -top-20 -right-20 w-72 h-72 bg-purple-900/10 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-40 -left-20 w-96 h-96 bg-blue-900/10 rounded-full blur-3xl pointer-events-none -z-10" />
       
       <header className="mb-8 pb-6 border-b border-slate-700/50 relative">
         <h1 className="text-4xl sm:text-5xl font-bold mb-3 bg-linear-to-r from-slate-100 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">
@@ -48,8 +49,8 @@ const {
       </header>
 
       <div className="prose-container bg-slate-900/50 rounded-3xl p-6 sm:p-8 lg:p-12 shadow-xl backdrop-blur-lg border border-slate-700/30 relative overflow-hidden">
-        {/* 内容区装饰效果 */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl" />
+        {/* 👇 内容区装饰效果 - 添加 pointer-events-none */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative">
           <MarkdownRenderer content={post.content} />
         </div>

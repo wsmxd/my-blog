@@ -8,29 +8,22 @@ import type { Post } from '../../lib/posts';
 import TagBadge from '../components/TagBadge';
 
 interface BlogListClientProps {
-  posts: Pick<Post, 'slug' | 'meta'>[]; // 只需要 slug 和 meta，更精确（可选）
-  // 或直接用：posts: Post[];
+  posts: Pick<Post, 'slug' | 'meta'>[]; 
 }
 
-const POSTS_PER_PAGE = 6; // 每页显示的文章数量
+const POSTS_PER_PAGE = 6;
 
 export default function BlogListClient({ posts }: BlogListClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [reads, setReads] = useState<Record<string, number>>({});
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 根据分类筛选文章
   const filteredPosts = selectedCategory 
     ? posts.filter(post => post.meta.category === selectedCategory)
     : posts;
 
-  // 计算总页数
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
-  
-  // 重置到第一页当分类改变时
   const displayPage = currentPage > totalPages ? 1 : currentPage;
-  
-  // 获取当前页的文章
   const startIndex = (displayPage - 1) * POSTS_PER_PAGE;
   const endIndex = startIndex + POSTS_PER_PAGE;
   const currentPosts = filteredPosts.slice(startIndex, endIndex);
@@ -45,7 +38,6 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
         if (!mounted) return;
         setReads(data.perPost || {});
       } catch (err) {
-        // ignore
         console.error(err);
       }
     }
@@ -54,24 +46,22 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
     return () => { mounted = false; clearInterval(id); };
   }, []);
 
-  // 分页按钮点击处理
   const handlePageChange = (page: number) => {
     if (page === 1 && selectedCategory !== null) {
       setSelectedCategory(null);
     }
     setCurrentPage(page);
-    // 滚动到页面顶部
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 用于判断链接是否激活
   const isActive = (category: string | null) => selectedCategory === category;
 
   return (
-    <section className="space-y-6 pt-16 px-4 sm:px-6 relative">
-      {/* 背景装饰 */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-900/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-900/5 rounded-full blur-3xl" />
+    // 👇 添加 overflow-x-hidden 防止横向滚动
+    <section className="space-y-6 pt-16 px-4 sm:px-6 relative overflow-x-hidden">
+      {/* 👇 背景装饰 - 添加 pointer-events-none 并确保不溢出 */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-900/5 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-900/5 rounded-full blur-3xl pointer-events-none -z-10" />
       
       {/* 分类筛选按钮 */}
       <div className="mb-8 flex flex-wrap justify-center gap-3 relative z-10">
@@ -113,7 +103,8 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
         </motion.button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+      {/* 👇 文章列表网格 - 添加 w-full max-w-full */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 w-full max-w-full">
         {currentPosts.map((post, index) => (
         <Link
           key={post.slug}
@@ -143,8 +134,8 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
             }}
             className="group relative p-6 border border-slate-700/50 rounded-2xl bg-slate-900/80 backdrop-blur-md shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
           >
-            {/* 悬停时的光晕效果 */}
-            <div className="absolute inset-0 bg-linear-to-r from-blue-500/0 via-purple-500/5 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            {/* 👇 光晕效果 - 添加 pointer-events-none */}
+            <div className="absolute inset-0 bg-linear-to-r from-blue-500/0 via-purple-500/5 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             
             <div className="relative w-full h-48 mb-4 rounded-xl overflow-hidden bg-linear-to-br from-blue-900/20 to-purple-900/20">
               <motion.div
@@ -193,10 +184,8 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
         ))}
       </div>
       
-      {/* 分页按钮 - 只在文章数量大于6时显示 */}
       {filteredPosts.length > POSTS_PER_PAGE && (
         <div className="flex justify-center items-center gap-2 mt-10">
-          {/* 上一页按钮 */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -211,7 +200,6 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
             ← 上一页
           </motion.button>
 
-          {/* 页码按钮 */}
           <div className="flex gap-2">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <motion.button
@@ -230,7 +218,6 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
             ))}
           </div>
 
-          {/* 下一页按钮 */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
