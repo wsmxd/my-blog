@@ -49,9 +49,10 @@ export async function GET(request: Request) {
       const p = getPostBySlug(slug);
       // ensure default cover if missing and normalize
       const rawCover = p.meta?.cover;
-      let cover = rawCover || '/images/default-cover.svg';
-      if (typeof cover === 'string' && !cover.startsWith('/') && !/^https?:\/\//i.test(cover)) {
-        cover = `/images/${cover}`;
+      let cover: string = '/images/default-cover.svg';
+      // Keep absolute (/...), external (http/https) or bare filenames as-is.
+      if (typeof rawCover === 'string' && rawCover.trim().length > 0) {
+        cover = rawCover;
       }
       p.meta = {
         ...(p.meta || {}),

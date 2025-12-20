@@ -3,7 +3,7 @@ title: "cnn卷积流程"
 date: "2025-12-19"
 description: "卷积神经网络完整工作流程图解"
 tags: [python, cnn]
-cover: "/images/cnn.png"
+cover: "cnn.png"
 category: "professional"
 ---
 

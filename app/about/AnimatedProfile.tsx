@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import PrefixedImage from '../components/PrefixedImage';
 import Link from 'next/link';
 import type { ProfileData, SocialLink } from './page';
 import { GitHubIcon, TwitterIcon, LinkedInIcon, MailIcon, BilibiliIcon, DouyinIcon } from './SocialIcons';
@@ -40,7 +40,7 @@ export default function AnimatedProfile({ profile, socialLinks }: AnimatedProfil
         {/* 头像光晕 */}
         <div className="absolute inset-0 rounded-full bg-blue-500/50 blur-xl group-hover:bg-purple-500/60 transition-colors duration-500"></div>
         <div className="relative rounded-full overflow-hidden border-2 border-white/20 h-full w-full">
-            <Image
+            <PrefixedImage
             src="/avatar.jpg"
             alt={profile.name}
             fill // 使用 fill 让图片自适应容器

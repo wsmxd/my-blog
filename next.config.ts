@@ -2,6 +2,17 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '067srb2nq0mqarev.public.blob.vercel-storage.com',
+        // hostname: '**.public.blob.vercel-storage.com',
+      },
+    ],
+    unoptimized: process.env.NODE_ENV === 'development', // 开发环境禁用优化
+    minimumCacheTTL: 60,
+  },
   async redirects() {
     return [
       {

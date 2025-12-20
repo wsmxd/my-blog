@@ -42,10 +42,12 @@ export async function getAllPosts(category?: string): Promise<Post[]> {
         const file = fs.readFileSync(fullPath, 'utf8');
         const { data, content } = matter(file);
         const rawCover = (data as PostMeta)?.cover;
-        let cover = rawCover || '/images/default-cover.svg';
-        // normalize cover: allow absolute (/...), external (http/https) or filename -> /images/filename
-        if (typeof cover === 'string' && !cover.startsWith('/') && !/^https?:\/\//i.test(cover)) {
-          cover = `/images/${cover}`;
+        let cover: string = '/images/default-cover.svg';
+        // Rule:
+        // - If frontmatter provides an absolute path (/images/xxx) or external URL -> keep as-is
+        // - If it provides a bare filename (e.g. cnn.png) -> keep as-is to allow PrefixedImage to add Blob prefix
+        if (typeof rawCover === 'string' && rawCover.trim().length > 0) {
+          cover = rawCover;
         }
         const meta = {
           ...(data as PostMeta),
@@ -95,9 +97,9 @@ export async function getPostBySlug(slug: string): Promise<Post> {
     const file = fs.readFileSync(filePath, 'utf8');
     const { data, content } = matter(file);
     const rawCover = (data as PostMeta)?.cover;
-    let cover = rawCover || '/images/default-cover.svg';
-    if (typeof cover === 'string' && !cover.startsWith('/') && !/^https?:\/\//i.test(cover)) {
-      cover = `/images/${cover}`;
+    let cover: string = '/images/default-cover.svg';
+    if (typeof rawCover === 'string' && rawCover.trim().length > 0) {
+      cover = rawCover;
     }
     const meta = {
       ...(data as PostMeta),

@@ -3,7 +3,7 @@ title: "Avalonia跨平台项目踩坑记1"
 date: "2025-12-9"
 description: "我之前弄过一个基于Avalonia的跨平台小项目，今天用Rider打开后发现Android项目中突然就有报错了，这次记录一下踩的坑。"
 tags: [C#, Android, Avalonia]
-cover: "/images/AvaloniaCrossError.png"
+cover: "AvaloniaCrossError.png"
 category: "professional"
 ---
 ## 🕳️ 在Android项目中主要踩的 5 个大坑

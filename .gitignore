@@ -44,3 +44,6 @@ next-env.d.ts
 /public/sitemap*.xml
 
 .qoder
+
+.vercel
+.env*.local

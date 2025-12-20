@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import PrefixedImage from './PrefixedImage';
 
 const CustomImg = ({ src, alt }: { src?: string; alt?: string }) => {
   if (!src) return null;
@@ -19,7 +19,7 @@ const CustomImg = ({ src, alt }: { src?: string; alt?: string }) => {
   }
 
   return (
-    <Image
+    <PrefixedImage
       src={src}
       alt={realAlt}
       width={width}

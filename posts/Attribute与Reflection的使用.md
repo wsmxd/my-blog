@@ -3,7 +3,7 @@ title: "Attribute 与反射的结合使用"
 date: "2025-12-1"
 description: "Attribute 与反射的结合使用"
 tags: [C#, .NET]
-cover: "/images/attribute_with_reflection.png"
+cover: "attribute_with_reflection.png"
 category: "professional"
 ---
 

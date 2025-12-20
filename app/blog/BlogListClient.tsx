@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import PrefixedImage from '../components/PrefixedImage';
 import { useEffect, useState } from 'react';
 import type { Post } from '../../lib/posts';
 import TagBadge from '../components/TagBadge';
@@ -143,7 +143,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 className="w-full h-full"
               >
-                <Image
+                <PrefixedImage
                   src={post.meta.cover || '/images/default-cover.svg'}
                   alt={post.meta.title}
                   fill

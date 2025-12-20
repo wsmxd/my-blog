@@ -3,7 +3,7 @@ title: "Hello World"
 date: "2025-10-24"
 description: "我的第一篇 Markdown 博客文章，欢迎来到我的现代化博客。"
 tags: [测试]
-cover: "/images/hello-world.jpg"
+cover: "hello-world.jpg"
 category: "professional"
 ---
 

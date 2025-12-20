@@ -3,7 +3,7 @@ title: "BindingFlags 的用法"
 date: "2025-12-1"
 description: "BindingFlags经常与反射一起使用，但它究竟是什么，为什么要用它，以及常见用法"
 tags: [C#]
-cover: "/images/BindingFlags.png"
+cover: "BindingFlags.png"
 category: "professional"
 ---
 

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import PrefixedImage from './PrefixedImage';
 
 export default function Header() {
   return (
@@ -21,7 +21,7 @@ export default function Header() {
             className="w-12 h-12 rounded-full overflow-hidden border-2 border-transparent hover:border-blue-500 transition-colors"
           >
             {/* 替换为你自己的头像路径，例如放在 public/avatar.jpg */}
-            <Image
+            <PrefixedImage
               src="/avatar.jpg"
               alt="Profile"
               width={48}   // 必须：与容器尺寸一致
