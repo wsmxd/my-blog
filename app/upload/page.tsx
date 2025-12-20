@@ -1,7 +1,7 @@
 'use client';
 
 import type { PutBlobResult } from '@vercel/blob';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function AvatarUploadPage() {
   const inputFileRef = useRef<HTMLInputElement>(null);
@@ -9,6 +9,7 @@ export default function AvatarUploadPage() {
   const [fileNames, setFileNames] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [token, setToken] = useState<string>('');
 
   const helpText = useMemo(
     () =>
@@ -17,6 +18,14 @@ export default function AvatarUploadPage() {
         : 'JPG / PNG / WEBP · 最大 10MB（浏览器限制）',
     [error],
   );
+
+  // 组件加载时从 localStorage 读取保存的 token
+  useEffect(() => {
+    const savedToken = localStorage.getItem('uploadToken');
+    if (savedToken) {
+      setToken(savedToken);
+    }
+  }, []);
 
   const handleFileChange = () => {
     const fileList = inputFileRef.current?.files;
@@ -68,14 +77,30 @@ export default function AvatarUploadPage() {
               return;
             }
 
+            if (!token.trim()) {
+              setError('请输入访问令牌');
+              return;
+            }
+
             setIsUploading(true);
             try {
+              // 保存 token 到 localStorage
+              if (token.trim()) {
+                localStorage.setItem('uploadToken', token.trim());
+              }
+
               const uploads = Array.from(fileList).map(async (file) => {
                 const response = await fetch(
                   `/api/avatar/upload?filename=${encodeURIComponent(file.name)}`,
                   {
                     method: 'POST',
                     body: file,
+                    headers: {
+                      // 使用用户输入的 token
+                      ...(token.trim()
+                        ? { Authorization: `Bearer ${token.trim()}` }
+                        : {}),
+                    },
                   },
                 );
 
@@ -95,6 +120,18 @@ export default function AvatarUploadPage() {
             }
           }}
         >
+          <label style={styles.inputLabel}>
+            <span style={styles.labelText}>访问令牌 (Token)</span>
+            <input
+              type="password"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="请输入访问令牌"
+              style={styles.tokenInput}
+              required
+            />
+          </label>
+
           <label style={styles.dropzone}>
             <input
               name="file"
@@ -274,5 +311,26 @@ const styles: Record<string, React.CSSProperties> = {
   },
   resultItem: {
     color: '#e5e7eb',
+  },
+  inputLabel: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
+  },
+  labelText: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: '#cbd5e1',
+    letterSpacing: 0.3,
+  },
+  tokenInput: {
+    padding: '10px 14px',
+    borderRadius: 10,
+    border: '1px solid rgba(148,163,184,0.35)',
+    background: 'rgba(148,163,184,0.05)',
+    color: '#e5e7eb',
+    fontSize: 14,
+    outline: 'none',
+    transition: 'border-color 0.2s ease, background 0.2s ease',
   },
 };

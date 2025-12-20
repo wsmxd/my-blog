@@ -147,6 +147,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
                   src={post.meta.cover || '/images/default-cover.svg'}
                   alt={post.meta.title}
                   fill
+                  preload
                   className="object-cover"
                 />
               </motion.div>
