@@ -217,9 +217,10 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handlePageChange(page)}
+                style={displayPage === page ? activeButtonStyle : undefined}
                 className={`w-10 h-10 rounded-lg font-semibold transition-all duration-300 ${
                   displayPage === page
-                    ? 'bg-linear-to-r from-sky-500 to-cyan-500 dark:from-blue-500 dark:to-purple-500 text-white shadow-lg'
+                    ? 'text-white border border-transparent'
                     : 'bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)'
                 }`}
               >

@@ -17,10 +17,10 @@ export default function ReadTracker({ slug }: { slug: string }) {
       // fire-and-forget POST
       fetch(`/api/read/${encodeURIComponent(slug)}`, { method: 'POST', body: JSON.stringify({ count: 1 }), headers: { 'Content-Type': 'application/json' } })
         .then(() => {
-          try { localStorage.setItem(key, String(now)); } catch (e) {}
+          try { localStorage.setItem(key, String(now)); } catch {}
         })
         .catch(() => {});
-    } catch (err) {
+    } catch {
       // ignore in non-browser env
     }
   }, [slug]);
