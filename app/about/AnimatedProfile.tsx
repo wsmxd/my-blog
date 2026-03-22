@@ -29,7 +29,7 @@ export default function AnimatedProfile({ profile, socialLinks }: AnimatedProfil
       className="relative z-10 text-center max-w-2xl mx-auto px-6 py-12"
     >
       {/* 🔸 新增：卡片背景板 (玻璃拟态) */}
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl -z-10"></div>
+      <div className="about-profile-card absolute inset-0 -z-10 rounded-3xl border backdrop-blur-md" />
 
       {/* 头像 - 增加发光效果 */}
       <motion.div
@@ -38,8 +38,8 @@ export default function AnimatedProfile({ profile, socialLinks }: AnimatedProfil
         className="relative w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full mb-8 group"
       >
         {/* 头像光晕 */}
-        <div className="absolute inset-0 rounded-full bg-blue-500/50 blur-xl group-hover:bg-purple-500/60 transition-colors duration-500"></div>
-        <div className="relative rounded-full overflow-hidden border-2 border-white/20 h-full w-full">
+        <div className="absolute inset-0 rounded-full bg-cyan-300/55 blur-xl transition-colors duration-500 group-hover:bg-sky-300/70 dark:bg-blue-500/50 dark:group-hover:bg-purple-500/60" />
+        <div className="relative rounded-full overflow-hidden border-2 border-white/70 h-full w-full dark:border-white/20">
             <PrefixedImage
             src="/avatar.jpg"
             alt={profile.name}
@@ -50,16 +50,16 @@ export default function AnimatedProfile({ profile, socialLinks }: AnimatedProfil
         </div>
       </motion.div>
 
-      <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-linear-to-r from-white via-blue-100 to-slate-300 mb-2 drop-shadow-sm">
+      <h1 className="about-profile-title mb-2 bg-linear-to-r from-sky-700 via-cyan-600 to-blue-500 bg-clip-text text-4xl font-bold text-transparent drop-shadow-sm md:text-5xl">
         {profile.name}
       </h1>
-      <p className="text-lg text-blue-200/80 mb-6 font-medium tracking-wide">{profile.title}</p>
+      <p className="about-profile-subtitle mb-6 text-lg font-medium tracking-wide">{profile.title}</p>
 
       <motion.p
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="text-slate-300 leading-relaxed mb-8 max-w-lg mx-auto"
+        className="about-profile-bio mx-auto mb-8 max-w-lg leading-relaxed"
       >
         {profile.bio}
       </motion.p>
@@ -79,8 +79,7 @@ export default function AnimatedProfile({ profile, socialLinks }: AnimatedProfil
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative p-3.5 rounded-xl bg-white/5 hover:bg-white/10
-                        border border-white/10 shadow-none"
+              className="about-social-btn group relative rounded-xl border p-3.5 shadow-none"
               aria-label={link.name}
               whileHover={{
                 y: -4,                           // 向上 4 px
@@ -88,7 +87,7 @@ export default function AnimatedProfile({ profile, socialLinks }: AnimatedProfil
               }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }} // 弹性过渡
             >
-              <Icon className="w-5 h-5 text-slate-300 group-hover:text-blue-200 transition-colors duration-500" />
+              <Icon className="about-social-icon h-5 w-5 transition-colors duration-500" />
             </motion.a>
           );
         })}
@@ -103,7 +102,7 @@ export default function AnimatedProfile({ profile, socialLinks }: AnimatedProfil
       >
         <Link
           href="/blog"
-          className="inline-flex items-center gap-2 px-6 py-2.5 text-sm text-slate-300 hover:text-white border border-slate-700/50 hover:border-slate-500 rounded-full transition-all duration-300 hover:bg-white/5"
+          className="about-back-btn inline-flex items-center gap-2 rounded-full border px-6 py-2.5 text-sm transition-all duration-300"
         >
           <span>←</span> <span className="tracking-wide">Back to Blog</span>
         </Link>
