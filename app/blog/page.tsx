@@ -6,7 +6,7 @@ export const dynamic = 'force-static';
 export const revalidate = 3600; // 1小时重新验证一次
 
 export const metadata = {
-  title: '博客 | My Modern Blog',
+  title: '博客',
   description: '分享技术、思考与生活点滴。',
 };
 

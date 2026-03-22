@@ -15,8 +15,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "My Modern Blog",
-  description: "个人博客 — 基于 Next.js、Markdown 与 Giscus 评论",
+  title: {
+    default: "mxd的小窝",
+    template: "%s | mxd的小窝",
+  },
+  description: "mxd 的个人博客，记录技术、思考与生活。",
 };
 
 export default function RootLayout({
@@ -25,9 +28,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" suppressHydrationWarning className="dark">
+    <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
+  const storageKey = 'theme-preference';
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const saved = localStorage.getItem(storageKey);
+  const theme = saved === 'light' || saved === 'dark' ? saved : (prefersDark ? 'dark' : 'light');
+  document.documentElement.classList.remove('light', 'dark');
+  document.documentElement.classList.add(theme);
+})();`,
+          }}
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-200 transition-colors duration-300`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-300`}
       >
         <div className="min-h-screen flex flex-col">
           <Header />
