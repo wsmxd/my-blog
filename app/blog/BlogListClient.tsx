@@ -112,8 +112,9 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
         </motion.button>
       </div>
 
-      {/* 👇 文章列表网格 - 添加 w-full max-w-full */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2 w-full max-w-full">
+      {/* 👇 文章列表网格 - 含最大宽度和响应式列数 */}
+      <div className="mx-auto w-full max-w-6xl px-4">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 w-full">
         {currentPosts.map((post, index) => (
         <Link
           key={post.slug}
@@ -141,12 +142,12 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
               y: -8,
               transition: { duration: 0.3, ease: 'easeOut' }
             }}
-            className="group relative p-6 border border-(--card-border) rounded-2xl bg-(--surface-soft) backdrop-blur-md shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
+            className="group relative p-6 border border-(--card-border) rounded-2xl bg-(--surface-soft) backdrop-blur-md shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer h-full flex flex-col"
           >
             {/* 👇 光晕效果 - 添加 pointer-events-none */}
             <div className="absolute inset-0 bg-linear-to-r from-blue-500/0 via-purple-500/5 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             
-            <div className="relative w-full h-48 mb-4 rounded-xl overflow-hidden bg-linear-to-br from-blue-900/20 to-purple-900/20">
+            <div className="relative w-full aspect-video mb-4 rounded-xl overflow-hidden bg-linear-to-br from-blue-900/20 to-purple-900/20">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -177,7 +178,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
               {post.meta.description || '暂无描述'}
             </p>
             
-            <div className="flex items-center justify-between text-sm pt-4 border-t border-(--card-border)">
+            <div className="flex items-center justify-between text-sm pt-4 border-t border-(--card-border) mt-auto">
               <div className="flex-1 mr-2">
                 <TagBadge tags={post.meta.tags} maxTags={3} />
               </div>
@@ -192,10 +193,11 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
           </motion.article>
         </Link>
         ))}
+        </div>
       </div>
       
       {filteredPosts.length > POSTS_PER_PAGE && (
-        <div className="flex justify-center items-center gap-2 mt-10">
+        <div className="mx-auto w-full max-w-6xl px-4 flex justify-center items-center gap-2 mt-10">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
