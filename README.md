@@ -48,6 +48,37 @@ npm run dev
 - 若想改善样式，建议启用 Tailwind 的 typography 插件以获得更好的 `prose` 样式。
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Worker Binding Upload (R2)
+
+The video upload API now proxies uploads to a Cloudflare Worker that writes files through R2 binding.
+
+### Required env for Next.js
+
+- `WORKER_UPLOAD_URL`: Base URL for the upload worker (example: `https://upload.wsmxd.workers.dev`)
+- `VIDEO_UPLOAD_TOKEN`: Shared bearer token used by upload page and worker
+- `VIDEO_UPLOAD_MAX_MB` (optional): Max upload size in MB for Next.js pre-check
+
+### Required env/secrets for Worker
+
+In `worker/wrangler.toml`:
+
+- `ALLOWED_ORIGINS`
+- `PUBLIC_BASE_URL`
+- `MAX_UPLOAD_MB`
+
+Set worker secret:
+
+```bash
+npx --yes wrangler secret put UPLOAD_TOKEN --config worker/wrangler.toml
+```
+
+### Worker commands
+
+```bash
+npm run worker:dev
+npm run worker:deploy
+```
+
 ## Getting Started
 
 First, run the development server:
