@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type UploadResult = {
   key: string;
@@ -17,6 +17,14 @@ export default function VideoUploadPage() {
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
+
+  // 组件加载时从 localStorage 读取保存的 token
+  useEffect(() => {
+    const savedToken = localStorage.getItem('uploadVideoToken');
+    if (savedToken) {
+      setToken(savedToken);
+    }
+  }, []);
 
   const snippet = useMemo(() => {
     if (!result) return '';
@@ -47,13 +55,23 @@ export default function VideoUploadPage() {
               return;
             }
 
+            if (!token.trim()) {
+              setError('请输入访问令牌');
+              return;
+            }
+
             setIsUploading(true);
             try {
+              // 保存 token 到 localStorage
+              if (token.trim()) {
+                localStorage.setItem('uploadVideoToken', token.trim());
+              }
+
               const response = await fetch(`/api/videos/upload?filename=${encodeURIComponent(file.name)}`, {
                 method: 'POST',
                 body: file,
                 headers: {
-                  ...(token.trim() ? { Authorization: `Bearer ${token.trim()}` } : {}),
+                  Authorization: `Bearer ${token.trim()}`,
                   'Content-Type': file.type,
                 },
               });
