@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-scheme: light dark;
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
 :root {
   --background: #f7fafc;
   --foreground: #0f172a;
@@ -23,6 +41,9 @@
   --tag-border: rgba(2, 132, 199, 0.25);
   --tag-text: #075985;
   --tag-bg-hover: rgba(2, 132, 199, 0.18);
+  --article-title-from: #e2e8f0;
+  --article-title-via: #3b82f6;
+  --article-title-to: #7c3aed;
 }
 
 .dark {
@@ -48,6 +69,9 @@
   --tag-border: rgba(96, 165, 250, 0.34);
   --tag-text: #bfdbfe;
   --tag-bg-hover: rgba(59, 130, 246, 0.24);
+  --article-title-from: #f1f5f9;
+  --article-title-via: #60a5fa;
+  --article-title-to: #c084fc;
 }
 
 @theme inline {
