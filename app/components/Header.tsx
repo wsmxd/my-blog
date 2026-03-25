@@ -53,6 +53,13 @@ export default function Header() {
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
           </Link>
           <Link
+            href="/videos"
+            className="text-(--muted-foreground) hover:text-blue-500 transition-colors relative group text-base sm:text-lg"
+          >
+            视频
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
+          </Link>
+          <Link
             href="https://github.com/wsmxd/my-blog"
             target="_blank"
             rel="noopener noreferrer"

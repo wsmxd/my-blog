@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "worker:dev": "npx --yes wrangler dev --config worker/wrangler.toml",
+    "worker:deploy": "npx --yes wrangler deploy --config worker/wrangler.toml",
+    "worker:types": "npx --yes wrangler types --config worker/wrangler.toml"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",
@@ -21,6 +24,7 @@
     "react-canvas-nest": "^1.1.1",
     "react-dom": "19.2.0",
     "react-markdown": "^8.0.0",
+    "react-player": "^3.4.0",
     "react-syntax-highlighter": "^15.5.0",
     "rehype-sanitize": "^5.0.0",
     "remark-gfm": "^3.0.1"

@@ -10,7 +10,7 @@ export async function POST(
   const slug = resolvedParams.slug;
   if (!slug) return NextResponse.json({ ok: false }, { status: 400 });
 
-  const body = await req.json().catch(() => ({}));
+  const body = (await req.json().catch(() => null)) as { count?: unknown } | null;
   const inc = Number(body?.count ?? 1) || 1;
 
   try {

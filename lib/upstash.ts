@@ -36,7 +36,7 @@ export async function upstashGet(key: string): Promise<number> {
     return 0;
   }
 
-  const data = await res.json();
+  const data = (await res.json()) as { result?: unknown };
   return Number(data.result ?? 0);
 }
 

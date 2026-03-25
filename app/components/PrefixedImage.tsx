@@ -1,6 +1,6 @@
 import NextImage, { ImageProps } from 'next/image';
 
-const BLOB_PREFIX = 'https://067srb2nq0mqarev.public.blob.vercel-storage.com/';
+const BLOB_PREFIX = process.env.NEXT_PUBLIC_BLOB_PREFIX || 'https://067srb2nq0mqarev.public.blob.vercel-storage.com/';
 
 function withBlobPrefix(src: string): string {
   // absolute URLs or root-relative paths are kept as-is

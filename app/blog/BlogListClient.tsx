@@ -34,7 +34,7 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
       try {
         const res = await fetch('/api/stats');
         if (!res.ok) return;
-        const data = await res.json();
+        const data = (await res.json()) as { perPost?: Record<string, number> };
         if (!mounted) return;
         setReads(data.perPost || {});
       } catch (error) {
