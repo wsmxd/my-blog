@@ -1,0 +1,20 @@
+name = "my-blog-media-upload"
+main = "src/index.ts"
+compatibility_date = "2026-03-25"
+workers_dev = false
+
+routes = [
+	{ pattern = "wsmxd.top/upload-worker/*", zone_id = "7c6833fe40456a1bf721274795209ac7" }
+]
+
+[[r2_buckets]]
+binding = "VIDEO_BUCKET"
+bucket_name = "video"
+
+[vars]
+# Comma-separated origins allowed to upload
+ALLOWED_ORIGINS = "http://localhost:3000,https://wsmxd.top"
+# Public URL prefix for returned object URLs
+PUBLIC_BASE_URL = "https://media.wsmxd.top"
+# Max upload size in MB
+MAX_UPLOAD_MB = "200"
