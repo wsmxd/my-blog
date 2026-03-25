@@ -47,3 +47,9 @@ next-env.d.ts
 
 .vercel
 .env*.local
+
+# cloudflare wrangler
+.wrangler/
+worker/.wrangler/
+worker/.dev.vars
+worker/.env
