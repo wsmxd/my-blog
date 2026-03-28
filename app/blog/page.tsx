@@ -1,6 +1,8 @@
 import { getAllPosts } from '../../lib/posts';
 import BlogListClient from './BlogListClient';
 
+const POSTS_PER_PAGE = 6;
+
 // 强制静态生成
 export const dynamic = 'force-static';
 export const revalidate = 3600; // 1小时重新验证一次
@@ -11,10 +13,11 @@ export const metadata = {
 };
 
 export default async function BlogIndex() {
-  // 获取所有文章，在客户端进行筛选
-  const posts = await getAllPosts();
+  const allPosts = await getAllPosts();
+  const totalPages = Math.max(1, Math.ceil(allPosts.length / POSTS_PER_PAGE));
+  const posts = allPosts.slice(0, POSTS_PER_PAGE);
 
   return (
-    <BlogListClient posts={posts} />
+    <BlogListClient posts={posts} currentPage={1} totalPages={totalPages} />
   );
 }

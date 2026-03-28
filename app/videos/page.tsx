@@ -1,6 +1,8 @@
 import { getAllVideos } from '../../lib/videos';
 import VideoListClient from './VideoListClient';
 
+const VIDEOS_PER_PAGE = 6;
+
 export const dynamic = 'force-static';
 export const revalidate = 3600;
 
@@ -10,6 +12,8 @@ export const metadata = {
 };
 
 export default async function VideoIndexPage() {
-  const videos = await getAllVideos();
-  return <VideoListClient videos={videos} />;
+  const allVideos = await getAllVideos();
+  const totalPages = Math.max(1, Math.ceil(allVideos.length / VIDEOS_PER_PAGE));
+  const videos = allVideos.slice(0, VIDEOS_PER_PAGE);
+  return <VideoListClient videos={videos} currentPage={1} totalPages={totalPages} />;
 }

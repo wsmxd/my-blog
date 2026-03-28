@@ -8,26 +8,14 @@ import type { Post } from '../../lib/posts';
 import TagBadge from '../components/TagBadge';
 
 interface BlogListClientProps {
-  posts: Pick<Post, 'slug' | 'meta'>[]; 
+  posts: Pick<Post, 'slug' | 'meta'>[];
+  currentPage: number;
+  totalPages: number;
 }
 
-const POSTS_PER_PAGE = 6;
-
-export default function BlogListClient({ posts }: BlogListClientProps) {
+export default function BlogListClient({ posts, currentPage, totalPages }: BlogListClientProps) {
   const prefersReducedMotion = useReducedMotion();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [reads, setReads] = useState<Record<string, number>>({});
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const filteredPosts = selectedCategory 
-    ? posts.filter(post => post.meta.category === selectedCategory)
-    : posts;
-
-  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
-  const displayPage = currentPage > totalPages ? 1 : currentPage;
-  const startIndex = (displayPage - 1) * POSTS_PER_PAGE;
-  const endIndex = startIndex + POSTS_PER_PAGE;
-  const currentPosts = filteredPosts.slice(startIndex, endIndex);
 
   useEffect(() => {
     let mounted = true;
@@ -44,20 +32,15 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
     }
     fetchStats();
     const id = setInterval(fetchStats, 30_000);
-    return () => { mounted = false; clearInterval(id); };
+    return () => {
+      mounted = false;
+      clearInterval(id);
+    };
   }, []);
 
-  const handlePageChange = (page: number) => {
-    if (page === 1 && selectedCategory !== null) {
-      setSelectedCategory(null);
-    }
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const getPageHref = (page: number) => (page <= 1 ? '/blog' : `/blog/page/${page}`);
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  const isActive = (category: string | null) => selectedCategory === category;
-  const inactiveButtonClass = 'bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border-2 border-(--card-border) backdrop-blur-md';
-  const activeButtonClass = 'text-white shadow-xl scale-105 border border-transparent';
   const activeButtonStyle = {
     backgroundImage: 'linear-gradient(90deg, var(--filter-active-from), var(--filter-active-to))',
     boxShadow: '0 10px 28px -10px var(--filter-active-shadow)',
@@ -95,65 +78,19 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
   };
 
   return (
-    // 👇 添加 overflow-x-hidden 防止横向滚动
     <section className="space-y-6 pt-16 px-4 sm:px-6 relative overflow-x-hidden">
-      {/* 👇 背景装饰 - 添加 pointer-events-none 并确保不溢出 */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-purple-900/5 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-900/5 rounded-full blur-3xl pointer-events-none -z-10" />
-      
-      {/* 分类筛选按钮 */}
-      <div className="mb-8 flex flex-wrap justify-center gap-3 relative z-10">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setSelectedCategory(null)}
-          style={!selectedCategory ? activeButtonStyle : undefined}
-          className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
-            !selectedCategory
-              ? activeButtonClass
-              : inactiveButtonClass
-          }`}
-        >
-          全部
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setSelectedCategory('professional')}
-          style={isActive('professional') ? activeButtonStyle : undefined}
-          className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
-            isActive('professional')
-              ? activeButtonClass
-              : inactiveButtonClass
-          }`}
-        >
-          专业文章
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setSelectedCategory('daily')}
-          style={isActive('daily') ? activeButtonStyle : undefined}
-          className={`px-6 py-3 rounded-xl transition-all duration-200 whitespace-nowrap font-semibold ${
-            isActive('daily')
-              ? activeButtonClass
-              : inactiveButtonClass
-          }`}
-        >
-          日常随笔
-        </motion.button>
-      </div>
 
-      {/* 👇 文章列表网格 - 含最大宽度和响应式列数 */}
       <div className="mx-auto w-full max-w-6xl px-4">
         <motion.div
-          key={`${selectedCategory ?? 'all'}-${displayPage}`}
+          key={`blog-${currentPage}`}
           initial="hidden"
           animate="show"
           variants={gridVariants}
           className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 w-full"
         >
-        {currentPosts.map((post) => (
+        {posts.map((post) => (
         <Link
           key={post.slug}
           href={`/blog/${post.slug}`}
@@ -187,7 +124,6 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
             }
             className="group relative p-6 border border-(--card-border) rounded-2xl bg-(--surface-soft) backdrop-blur-md shadow-lg hover:shadow-2xl transition-[transform,box-shadow,border-color,background-color] duration-260 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden cursor-pointer h-full flex flex-col will-change-transform"
           >
-            {/* 👇 光晕效果 - 添加 pointer-events-none */}
             <div className="absolute inset-0 bg-linear-to-r from-blue-500/0 via-purple-500/5 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-260 ease-out pointer-events-none" />
             <div className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/15 to-transparent opacity-0 group-hover:translate-x-full group-hover:opacity-100 transition-[transform,opacity] duration-340 ease-[cubic-bezier(0.22,1,0.36,1)]" />
             
@@ -235,55 +171,64 @@ export default function BlogListClient({ posts }: BlogListClientProps) {
         ))}
         </motion.div>
       </div>
-      
-      {filteredPosts.length > POSTS_PER_PAGE && (
+
+      {totalPages > 1 && (
         <div className="mx-auto w-full max-w-6xl px-4 flex justify-center items-center gap-2 mt-10">
-          <motion.button
+          <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => handlePageChange(displayPage - 1)}
-            disabled={displayPage === 1}
-            className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
-              displayPage === 1
-                ? 'bg-(--surface-soft) text-(--muted-foreground)/70 cursor-not-allowed border border-(--card-border)'
-                : 'bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)'
-            }`}
           >
-            ← 上一页
-          </motion.button>
+            {currentPage === 1 ? (
+              <span
+                className="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground)/70 cursor-not-allowed border border-(--card-border)"
+              >
+                ← 上一页
+              </span>
+            ) : (
+              <Link
+                href={getPageHref(currentPage - 1)}
+                className="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)"
+              >
+                ← 上一页
+              </Link>
+            )}
+          </motion.div>
 
           <div className="flex gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <motion.button
-                key={page}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handlePageChange(page)}
-                style={displayPage === page ? activeButtonStyle : undefined}
-                className={`w-10 h-10 rounded-lg font-semibold transition-all duration-300 ${
-                  displayPage === page
-                    ? 'text-white border border-transparent'
-                    : 'bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)'
-                }`}
-              >
-                {page}
-              </motion.button>
+            {pageNumbers.map((page) => (
+              <motion.div key={page} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  href={getPageHref(page)}
+                  style={currentPage === page ? activeButtonStyle : undefined}
+                  aria-current={currentPage === page ? 'page' : undefined}
+                  className={`w-10 h-10 rounded-lg font-semibold transition-all duration-300 inline-flex items-center justify-center ${
+                    currentPage === page
+                      ? 'text-white border border-transparent'
+                      : 'bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)'
+                  }`}
+                >
+                  {page}
+                </Link>
+              </motion.div>
             ))}
           </div>
 
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => handlePageChange(displayPage + 1)}
-            disabled={displayPage === totalPages}
-            className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
-              displayPage === totalPages
-                ? 'bg-(--surface-soft) text-(--muted-foreground)/70 cursor-not-allowed border border-(--card-border)'
-                : 'bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)'
-            }`}
-          >
-            下一页 →
-          </motion.button>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            {currentPage === totalPages ? (
+              <span
+                className="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground)/70 cursor-not-allowed border border-(--card-border)"
+              >
+                下一页 →
+              </span>
+            ) : (
+              <Link
+                href={getPageHref(currentPage + 1)}
+                className="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)"
+              >
+                下一页 →
+              </Link>
+            )}
+          </motion.div>
         </div>
       )}
     </section>
