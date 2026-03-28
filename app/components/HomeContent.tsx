@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface HomeContentProps {
   postsCount: number;
@@ -9,6 +9,9 @@ interface HomeContentProps {
 }
 
 export default function HomeContent({ postsCount, totalReads }: HomeContentProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const features = ["🚀 快速加载", "📱 响应式", "🎨 现代化", "📝 Markdown"];
+
   return (
     <section className="text-center space-y-8 max-w-2xl mx-auto px-6 relative z-10">
       {/* 主标题 */}
@@ -28,25 +31,65 @@ export default function HomeContent({ postsCount, totalReads }: HomeContentProps
       </motion.div>
 
       {/* 特性标签 */}
-      <div className="flex flex-wrap justify-center gap-3">
-        {["🚀 快速加载", "📱 响应式", "🎨 现代化", "📝 Markdown"].map((feature, index) => (
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: {
+            transition: {
+              staggerChildren: prefersReducedMotion ? 0 : 0.06,
+              delayChildren: prefersReducedMotion ? 0 : 0.08,
+            },
+          },
+        }}
+        className="flex flex-wrap justify-center gap-3"
+      >
+        {features.map((feature, index) => (
           <motion.span
             key={feature}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.1, duration: 0.3 }}
-            whileHover={{ 
-              scale: 1.15, 
-              rotate: [0, -5, 5, 0],
-              transition: { duration: 0.3 }
+            custom={index}
+            variants={{
+              hidden: {
+                opacity: 0,
+                y: prefersReducedMotion ? 0 : 10,
+                scale: prefersReducedMotion ? 1 : 0.96,
+              },
+              visible: (i: number) => ({
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                transition: prefersReducedMotion
+                  ? { duration: 0.01 }
+                  : {
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 24,
+                      mass: 0.75,
+                      delay: i * 0.02,
+                    },
+              }),
             }}
+            whileHover={
+              prefersReducedMotion
+                ? undefined
+                : {
+                    y: -3,
+                    scale: 1.045,
+                    transition: {
+                      type: 'spring',
+                      stiffness: 420,
+                      damping: 28,
+                    },
+                  }
+            }
             whileTap={{ scale: 0.95 }}
-            className="px-5 py-2.5 rounded-full text-foreground text-sm font-semibold border-2 border-(--card-border) bg-(--surface-soft) hover:border-blue-400/60 hover:shadow-lg cursor-pointer transition-all duration-300"
+            className="px-5 py-2.5 rounded-full text-foreground text-sm font-semibold border-2 border-(--card-border) bg-(--surface-soft) hover:border-blue-400/60 hover:shadow-lg cursor-pointer transition-colors duration-300 will-change-transform"
           >
             {feature}
           </motion.span>
         ))}
-      </div>
+      </motion.div>
 
       {/* CTA 按钮 */}
       <div className="pt-6">
