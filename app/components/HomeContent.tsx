@@ -6,9 +6,10 @@ import { motion, useReducedMotion } from 'framer-motion';
 interface HomeContentProps {
   postsCount: number;
   totalReads: number;
+  videosCount: number;
 }
 
-export default function HomeContent({ postsCount, totalReads }: HomeContentProps) {
+export default function HomeContent({ postsCount, totalReads, videosCount }: HomeContentProps) {
   const prefersReducedMotion = useReducedMotion();
   const features = ["🚀 快速加载", "📱 响应式", "🎨 现代化", "📝 Markdown"];
 
@@ -119,22 +120,64 @@ export default function HomeContent({ postsCount, totalReads }: HomeContentProps
       {/* 统计数据 */}
       <div className="flex justify-center gap-6 pt-8 flex-wrap">
         <motion.div 
-          whileHover={{ scale: 1.1, y: -5 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          className="text-center p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/30 cursor-pointer transition-all duration-300 min-w-[140px]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
+          whileHover={{ 
+            y: -8,
+            scale: 1.02,
+            transition: {
+              type: "spring",
+              stiffness: 300,
+              damping: 24,
+              mass: 0.9,
+            }
+          }}
+          whileTap={{ scale: 0.98 }}
+          className="text-center p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/30 cursor-pointer transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] min-w-[140px] will-change-transform"
         >
           <div className="text-4xl font-bold bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">{postsCount}</div>
           <div className="text-sm mt-2 font-semibold text-(--muted-foreground)">博客文章</div>
         </motion.div>
         <motion.div 
-          whileHover={{ scale: 1.1, y: -5 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          className="text-center p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/30 cursor-pointer transition-all duration-300 min-w-[140px]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut', delay: 0.25 }}
+          whileHover={{ 
+            y: -8,
+            scale: 1.02,
+            transition: {
+              type: "spring",
+              stiffness: 300,
+              damping: 24,
+              mass: 0.9,
+            }
+          }}
+          whileTap={{ scale: 0.98 }}
+          className="text-center p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/30 cursor-pointer transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] min-w-[140px] will-change-transform"
         >
           <div className="text-4xl font-bold bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">{totalReads}</div>
           <div className="text-sm mt-2 font-semibold text-(--muted-foreground)">阅读量</div>
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut', delay: 0.3 }}
+          whileHover={{ 
+            y: -8,
+            scale: 1.02,
+            transition: {
+              type: "spring",
+              stiffness: 300,
+              damping: 24,
+              mass: 0.9,
+            }
+          }}
+          whileTap={{ scale: 0.98 }}
+          className="text-center p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/30 cursor-pointer transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] min-w-[140px] will-change-transform"
+        >
+          <div className="text-4xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{videosCount}</div>
+          <div className="text-sm mt-2 font-semibold text-(--muted-foreground)">视频作品</div>
         </motion.div>
       </div>
     </section>
