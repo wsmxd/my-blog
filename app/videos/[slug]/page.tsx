@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import MarkdownRenderer from '../../components/MarkdownRenderer';
+import Giscus from '../../components/Giscus';
 import { ErrorBoundary } from '../../components/ErrorBoundary';
 import { getAllVideos, getVideoBySlug } from '../../../lib/videos';
 import VideoPlayer from './VideoPlayer';
@@ -18,6 +19,13 @@ export async function generateStaticParams() {
 }
 
 const VideoContent = async ({ video }: { video: Awaited<ReturnType<typeof getVideoBySlug>> }) => {
+  const {
+    NEXT_PUBLIC_GISCUS_REPO,
+    NEXT_PUBLIC_GISCUS_REPO_ID,
+    NEXT_PUBLIC_GISCUS_CATEGORY,
+    NEXT_PUBLIC_GISCUS_CATEGORY_ID,
+  } = process.env;
+
   return (
     <article className="pt-12 max-w-5xl mx-auto relative overflow-x-hidden w-full">
       <div className="absolute -top-20 -right-20 w-72 h-72 bg-purple-400/5 dark:bg-purple-900/10 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -44,6 +52,24 @@ const VideoContent = async ({ video }: { video: Awaited<ReturnType<typeof getVid
         <div className="relative">
           <MarkdownRenderer content={video.content} />
         </div>
+      </div>
+
+      {/* comments */}
+      <div className="mt-12">
+        {NEXT_PUBLIC_GISCUS_REPO && NEXT_PUBLIC_GISCUS_REPO_ID && NEXT_PUBLIC_GISCUS_CATEGORY && NEXT_PUBLIC_GISCUS_CATEGORY_ID ? (
+          <div className="bg-white dark:bg-slate-900/50 rounded-3xl p-6 backdrop-blur-lg border-slate-100 dark:border-slate-700/30 border">
+            <Giscus
+              repo={NEXT_PUBLIC_GISCUS_REPO}
+              repoId={NEXT_PUBLIC_GISCUS_REPO_ID}
+              category={NEXT_PUBLIC_GISCUS_CATEGORY}
+              categoryId={NEXT_PUBLIC_GISCUS_CATEGORY_ID}
+            />
+          </div>
+        ) : (
+          <div className="mt-8 text-sm text-slate-600 dark:text-slate-400 text-center p-8 bg-slate-100 dark:bg-slate-800/50 rounded-3xl backdrop-blur-sm">
+            请在环境变量中配置 Giscus 相关信息以启用评论。
+          </div>
+        )}
       </div>
     </article>
   );
