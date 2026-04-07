@@ -1,13 +1,16 @@
-
 import { NextResponse } from 'next/server';
 import { upstashIncr, upstashGet } from '../../../../lib/upstash';
 
+function normalizeSlug(slug: string | string[]): string {
+  return decodeURIComponent(Array.isArray(slug) ? slug.join('/') : slug);
+}
+
 export async function POST(
   req: Request,
-  { params }: { params: Promise<{ slug: string }> } | { params: { slug: string } },
+  { params }: { params: Promise<{ slug: string[] }> } | { params: { slug: string[] } },
 ) {
   const resolvedParams = await params;
-  const slug = resolvedParams.slug;
+  const slug = normalizeSlug(resolvedParams.slug);
   if (!slug) return NextResponse.json({ ok: false }, { status: 400 });
 
   const body = (await req.json().catch(() => null)) as { count?: unknown } | null;
@@ -24,10 +27,10 @@ export async function POST(
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ slug: string }> } | { params: { slug: string } },
+  { params }: { params: Promise<{ slug: string[] }> } | { params: { slug: string[] } },
 ) {
   const resolvedParams = await params;
-  const slug = resolvedParams.slug;
+  const slug = normalizeSlug(resolvedParams.slug);
   if (!slug) return NextResponse.json({ ok: false }, { status: 400 });
 
   try {
