@@ -11,6 +11,20 @@ if (!UPSTASH_URL || !UPSTASH_TOKEN) {
 
 const redis = UPSTASH_URL && UPSTASH_TOKEN ? new Redis({ url: UPSTASH_URL, token: UPSTASH_TOKEN }) : null;
 
+function encodeRedisKeyPart(value: string): string {
+  // Keep Redis keys ASCII-only to avoid runtime ByteString issues with CJK slugs,
+  // while preserving existing ASCII key shapes (including '/').
+  return value.replace(/[^\x00-\x7F]/g, (char) => encodeURIComponent(char));
+}
+
+export function getReadKey(slug: string): string {
+  return `reads:${encodeRedisKeyPart(slug)}`;
+}
+
+export function getVideoPlayKey(slug: string): string {
+  return `video:plays:${encodeRedisKeyPart(slug)}`;
+}
+
 export async function upstashIncr(key: string, amount = 1): Promise<number> {
   if (!redis) throw new Error('Upstash not configured');
   // 大多数情况下 client 支持 incrby 或 incr

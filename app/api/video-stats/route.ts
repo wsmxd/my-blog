@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAllVideos } from '../../../lib/videos';
+import { getVideoPlayKey } from '../../../lib/upstash';
 
 export async function GET() {
   try {
@@ -7,7 +8,7 @@ export async function GET() {
     const perVideo: Record<string, number> = {};
 
     const { upstashMGet } = await import('../../../lib/upstash');
-    const keys = videos.map((v) => `video:plays:${v.slug}`);
+    const keys = videos.map((v) => getVideoPlayKey(v.slug));
     const vals = await upstashMGet(keys);
 
     let total = 0;

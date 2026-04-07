@@ -47,6 +47,13 @@ const PostContent = async ({ post }: { post: Awaited<ReturnType<typeof getPostBy
           </svg>
           {post.meta.date}
         </p>
+        {post.meta.folder ? (
+          <div className="mt-3">
+            <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full border border-(--tag-border) bg-(--tag-bg) text-(--tag-text)">
+              {post.meta.folder}
+            </span>
+          </div>
+        ) : null}
       </header>
 
       <div className="prose-container bg-white dark:bg-slate-900/50 rounded-3xl p-6 sm:p-8 lg:p-12 shadow-xl backdrop-blur-lg border-slate-100 dark:border-slate-700/30 border relative overflow-hidden">

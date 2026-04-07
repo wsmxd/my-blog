@@ -4,7 +4,6 @@ export type PostMeta = {
   description?: string;
   tags?: string[];
   cover?: string;
-  category?: string;
   folder?: string;
 };
 
@@ -15,6 +14,10 @@ export type Post = {
 };
 
 type SlugInput = string | string[];
+
+const POSTS_CACHE_TTL_MS = 15_000;
+let cachedAllPosts: Post[] | null = null;
+let cachedAt = 0;
 
 const getBaseUrl = () => {
   if (typeof window !== 'undefined') {
@@ -57,59 +60,71 @@ function readPostFile(filePath: string, postsDir: string): Post {
   }
 
   const folder = getPostFolder(filePath, postsDir);
-  const explicitCategory = (data as PostMeta)?.category;
-  const category = explicitCategory || folder;
+  const { category: _ignoredCategory, ...postData } = data as PostMeta & { category?: string };
 
   return {
     slug: getPostSlug(filePath, postsDir),
     meta: {
-      ...(data as PostMeta),
+      ...postData,
       cover,
-      category,
       folder,
     } as PostMeta,
     content,
   };
 }
 
-// Helper function to recursively read posts from posts directory and subdirectories
-function readPostsRecursive(dir: string, baseDir: string): Post[] {
+// Read markdown files from posts root and one-level subfolders only.
+function readPostsOneLevel(postsDir: string): Post[] {
   const fs = require('fs');
   const path = require('path');
 
   const posts: Post[] = [];
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const entries = fs.readdirSync(postsDir, { withFileTypes: true });
 
   for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
+    const fullPath = path.join(postsDir, entry.name);
+
+    if (entry.isFile() && entry.name.endsWith('.md')) {
+      posts.push(readPostFile(fullPath, postsDir));
+      continue;
+    }
 
     if (entry.isDirectory()) {
-      // Recursively read subdirectories
-      const subPosts = readPostsRecursive(fullPath, baseDir);
-      posts.push(...subPosts);
-    } else if (entry.isFile() && entry.name.endsWith('.md')) {
-      posts.push(readPostFile(fullPath, baseDir));
+      const childEntries = fs.readdirSync(fullPath, { withFileTypes: true });
+      for (const child of childEntries) {
+        if (!child.isFile() || !child.name.endsWith('.md')) continue;
+        const childPath = path.join(fullPath, child.name);
+        posts.push(readPostFile(childPath, postsDir));
+      }
     }
   }
 
   return posts;
 }
 
-// Helper function to find post file recursively
-function findPostFile(dir: string, baseDir: string, targetSlug: string): string | null {
+// Find a post file by slug from posts root and one-level subfolders.
+function findPostFile(postsDir: string, targetSlug: string): string | null {
   const fs = require('fs');
   const path = require('path');
-  
+
   try {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    const entries = fs.readdirSync(postsDir, { withFileTypes: true });
     for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
+      const fullPath = path.join(postsDir, entry.name);
+
+      if (entry.isFile() && entry.name.endsWith('.md')) {
+        if (getPostSlug(fullPath, postsDir) === targetSlug) return fullPath;
+        continue;
+      }
+
       if (entry.isDirectory()) {
-        const result = findPostFile(fullPath, baseDir, targetSlug);
-        if (result) return result;
-      } else if (entry.isFile() && entry.name.endsWith('.md')) {
-        if (getPostSlug(fullPath, baseDir) === targetSlug) {
-          return fullPath;
+        const childEntries = fs.readdirSync(fullPath, { withFileTypes: true });
+        for (const child of childEntries) {
+          if (!child.isFile() || !child.name.endsWith('.md')) continue;
+          const childPath = path.join(fullPath, child.name);
+          if (getPostSlug(childPath, postsDir) === targetSlug) {
+            return childPath;
+          }
         }
       }
     }
@@ -120,8 +135,14 @@ function findPostFile(dir: string, baseDir: string, targetSlug: string): string 
 }
 
 // On server: read files directly (more reliable). On client: call API.
-export async function getAllPosts(category?: string): Promise<Post[]> {
+export async function getAllPosts(folder?: string): Promise<Post[]> {
   if (typeof window === 'undefined') {
+    const now = Date.now();
+    if (cachedAllPosts && now - cachedAt < POSTS_CACHE_TTL_MS) {
+      if (!folder) return cachedAllPosts;
+      return cachedAllPosts.filter((post) => post.meta.folder === folder);
+    }
+
     // Server-side: use fs to read markdown files directly
     const fs = await import('fs');
     const path = await import('path');
@@ -129,7 +150,7 @@ export async function getAllPosts(category?: string): Promise<Post[]> {
     const postsDir = path.join(process.cwd(), 'posts');
     if (!fs.existsSync(postsDir)) return [];
 
-    let posts = readPostsRecursive(postsDir, postsDir);
+    let posts = readPostsOneLevel(postsDir);
     
     posts = posts.sort((a: Post, b: Post) => {
       const da = a.meta.date || '';
@@ -137,9 +158,12 @@ export async function getAllPosts(category?: string): Promise<Post[]> {
       return db.localeCompare(da);
     });
 
-    // Filter by category if specified
-    if (category) {
-      posts = posts.filter(post => post.meta.category === category);
+    cachedAllPosts = posts;
+    cachedAt = now;
+
+    // Filter by folder if specified
+    if (folder) {
+      posts = posts.filter(post => post.meta.folder === folder);
     }
 
     return posts;
@@ -147,7 +171,7 @@ export async function getAllPosts(category?: string): Promise<Post[]> {
 
   // Client-side: fetch from API
   const baseUrl = getBaseUrl();
-  const url = category ? `${baseUrl}/api/posts?category=${encodeURIComponent(category)}` : `${baseUrl}/api/posts`;
+  const url = folder ? `${baseUrl}/api/posts?folder=${encodeURIComponent(folder)}` : `${baseUrl}/api/posts`;
   const resp = await fetch(url, { next: { revalidate: 60 } });
   if (!resp.ok) throw new Error('Failed to fetch posts');
   return resp.json();
@@ -161,8 +185,8 @@ export async function getPostBySlug(slug: SlugInput): Promise<Post> {
     const postsDir = path.join(process.cwd(), 'posts');
     // Decode URI encoded slugs (e.g. "avalonia%20bindings" -> "avalonia bindings")
     const decodedSlug = normalizeSlugInput(slug);
-    
-    const filePath = findPostFile(postsDir, postsDir, decodedSlug);
+
+    const filePath = findPostFile(postsDir, decodedSlug);
     if (!filePath || !fs.existsSync(filePath)) {
       throw new Error(`Post not found: ${slug}`);
     }

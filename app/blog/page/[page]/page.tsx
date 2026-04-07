@@ -2,13 +2,13 @@ import { notFound, redirect } from 'next/navigation';
 import { getAllPosts } from '../../../../lib/posts';
 import BlogListClient from '../../BlogListClient';
 
-export const dynamic = 'force-static';
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 const POSTS_PER_PAGE = 6;
 
 type Props = {
   params: Promise<{ page: string }> | { page: string };
+  searchParams?: { folder?: string | string[] } | Promise<{ folder?: string | string[] }>;
 };
 
 export async function generateStaticParams() {
@@ -24,9 +24,12 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function BlogPagedIndex({ params }: Props) {
+export default async function BlogPagedIndex({ params, searchParams }: Props) {
   const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
   const pageNumber = Number(resolvedParams.page);
+  const folderParam = resolvedSearchParams?.folder;
+  const activeFolder = Array.isArray(folderParam) ? folderParam[0] : folderParam || undefined;
 
   if (!Number.isInteger(pageNumber) || pageNumber <= 0) {
     notFound();
@@ -37,14 +40,26 @@ export default async function BlogPagedIndex({ params }: Props) {
   }
 
   const allPosts = await getAllPosts();
-  const totalPages = Math.max(1, Math.ceil(allPosts.length / POSTS_PER_PAGE));
+  const folders = Array.from(new Set(allPosts.map((post) => post.meta.folder).filter(Boolean))) as string[];
+  const filteredPosts = activeFolder
+    ? allPosts.filter((post) => post.meta.folder === activeFolder)
+    : allPosts;
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / POSTS_PER_PAGE));
 
   if (pageNumber > totalPages) {
     notFound();
   }
 
   const start = (pageNumber - 1) * POSTS_PER_PAGE;
-  const posts = allPosts.slice(start, start + POSTS_PER_PAGE);
+  const posts = filteredPosts.slice(start, start + POSTS_PER_PAGE);
 
-  return <BlogListClient posts={posts} currentPage={pageNumber} totalPages={totalPages} />;
+  return (
+    <BlogListClient
+      posts={posts}
+      currentPage={pageNumber}
+      totalPages={totalPages}
+      folders={folders}
+      activeFolder={activeFolder}
+    />
+  );
 }

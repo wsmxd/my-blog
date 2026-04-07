@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { upstashIncr, upstashGet } from '../../../../lib/upstash';
+import { getReadKey, upstashIncr, upstashGet } from '../../../../lib/upstash';
 
 function normalizeSlug(slug: string | string[]): string {
   return decodeURIComponent(Array.isArray(slug) ? slug.join('/') : slug);
@@ -17,7 +17,7 @@ export async function POST(
   const inc = Number(body?.count ?? 1) || 1;
 
   try {
-    const key = `reads:${slug}`;
+    const key = getReadKey(slug);
     const newVal = await upstashIncr(key, inc);
     return NextResponse.json({ slug, count: newVal });
   } catch (err) {
@@ -34,7 +34,7 @@ export async function GET(
   if (!slug) return NextResponse.json({ ok: false }, { status: 400 });
 
   try {
-    const key = `reads:${slug}`;
+    const key = getReadKey(slug);
     const val = await upstashGet(key);
     return NextResponse.json({ slug, count: val });
   } catch (err) {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getVideoPlayKey } from '../../../../lib/upstash';
 
 export async function POST(
   req: Request,
@@ -12,7 +13,7 @@ export async function POST(
     const inc = Number(body?.count ?? 1) || 1;
 
     const { upstashIncr } = await import('../../../../lib/upstash');
-    const newVal = await upstashIncr(`video:plays:${slug}`, inc);
+    const newVal = await upstashIncr(getVideoPlayKey(slug), inc);
 
     return NextResponse.json({ slug, count: newVal });
   } catch (error) {
@@ -29,7 +30,7 @@ export async function GET(
     if (!slug) return NextResponse.json({ error: 'Missing slug' }, { status: 400 });
 
     const { upstashGet } = await import('../../../../lib/upstash');
-    const val = await upstashGet(`video:plays:${slug}`);
+    const val = await upstashGet(getVideoPlayKey(slug));
 
     return NextResponse.json({ slug, count: val });
   } catch (error) {

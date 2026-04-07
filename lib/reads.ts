@@ -1,11 +1,11 @@
 export async function getTotalReads(): Promise<number> {
   try {
     const { getAllPosts } = await import('./posts');
-    const { upstashGet } = await import('./upstash');
+    const { getReadKey, upstashGet } = await import('./upstash');
     const posts = await getAllPosts();
     const counts = await Promise.all(posts.map(async (p) => {
       try {
-        const v = await upstashGet(`reads:${p.slug}`);
+        const v = await upstashGet(getReadKey(p.slug));
         return Number(v || 0);
       } catch (e) {
         console.error(e);

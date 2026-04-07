@@ -7,25 +7,44 @@ import { useEffect, useState } from 'react';
 import type { Post } from '../../lib/posts';
 import TagBadge from '../components/TagBadge';
 
+const STATS_CACHE_TTL_MS = 30_000;
+let statsCache: { perPost: Record<string, number>; updatedAt: number } | null = null;
+
 interface BlogListClientProps {
   posts: Pick<Post, 'slug' | 'meta'>[];
   currentPage: number;
   totalPages: number;
+  folders?: string[];
+  activeFolder?: string;
 }
 
-export default function BlogListClient({ posts, currentPage, totalPages }: BlogListClientProps) {
+export default function BlogListClient({ posts, currentPage, totalPages, folders = [], activeFolder }: BlogListClientProps) {
   const prefersReducedMotion = useReducedMotion();
   const [reads, setReads] = useState<Record<string, number>>({});
 
   useEffect(() => {
     let mounted = true;
+
+    const hasFreshCache =
+      statsCache && Date.now() - statsCache.updatedAt < STATS_CACHE_TTL_MS;
+
+    if (hasFreshCache) {
+      setReads(statsCache!.perPost);
+    }
+
     async function fetchStats() {
       try {
+        if (!hasFreshCache && statsCache && Date.now() - statsCache.updatedAt < STATS_CACHE_TTL_MS) {
+          if (mounted) setReads(statsCache.perPost);
+          return;
+        }
         const res = await fetch('/api/stats');
         if (!res.ok) return;
         const data = (await res.json()) as { perPost?: Record<string, number> };
         if (!mounted) return;
-        setReads(data.perPost || {});
+        const perPost = data.perPost || {};
+        statsCache = { perPost, updatedAt: Date.now() };
+        setReads(perPost);
       } catch (error) {
         console.error(error);
       }
@@ -38,8 +57,12 @@ export default function BlogListClient({ posts, currentPage, totalPages }: BlogL
     };
   }, []);
 
-  const getPageHref = (page: number) => (page <= 1 ? '/blog' : `/blog/page/${page}`);
+  const getPageHref = (page: number) => {
+    const folderQuery = activeFolder ? `?folder=${encodeURIComponent(activeFolder)}` : '';
+    return page <= 1 ? `/blog${folderQuery}` : `/blog/page/${page}${folderQuery}`;
+  };
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const folderButtons = ['all', ...folders];
 
   const activeButtonStyle = {
     backgroundImage: 'linear-gradient(90deg, var(--filter-active-from), var(--filter-active-to))',
@@ -50,8 +73,8 @@ export default function BlogListClient({ posts, currentPage, totalPages }: BlogL
     hidden: {},
     show: {
       transition: {
-        staggerChildren: prefersReducedMotion ? 0 : 0.07,
-        delayChildren: prefersReducedMotion ? 0 : 0.05,
+        staggerChildren: prefersReducedMotion ? 0 : 0.02,
+        delayChildren: prefersReducedMotion ? 0 : 0.01,
       },
     },
   };
@@ -59,8 +82,8 @@ export default function BlogListClient({ posts, currentPage, totalPages }: BlogL
   const cardVariants = {
     hidden: {
       opacity: 0,
-      y: prefersReducedMotion ? 0 : 18,
-      scale: prefersReducedMotion ? 1 : 0.985,
+      y: prefersReducedMotion ? 0 : 8,
+      scale: prefersReducedMotion ? 1 : 0.995,
     },
     show: {
       opacity: 1,
@@ -70,9 +93,9 @@ export default function BlogListClient({ posts, currentPage, totalPages }: BlogL
         ? { duration: 0.01 }
         : {
             type: 'spring' as const,
-            stiffness: 145,
-            damping: 19,
-            mass: 0.82,
+            stiffness: 220,
+            damping: 24,
+            mass: 0.7,
           },
     },
   };
@@ -83,14 +106,37 @@ export default function BlogListClient({ posts, currentPage, totalPages }: BlogL
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-900/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
       <div className="mx-auto w-full max-w-6xl px-4">
+        <div className="mb-8 flex flex-wrap gap-3">
+          {folderButtons.map((folder) => {
+            const isAll = folder === 'all';
+            const isActive = isAll ? !activeFolder : activeFolder === folder;
+            const href = isAll ? '/blog' : `/blog?folder=${encodeURIComponent(folder)}`;
+
+            return (
+              <Link
+                key={folder}
+                href={href}
+                className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 border ${
+                  isActive
+                    ? 'border-transparent text-white shadow-lg'
+                    : 'border-(--card-border) bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong)'
+                }`}
+                style={isActive ? activeButtonStyle : undefined}
+              >
+                {isAll ? '全部' : folder}
+              </Link>
+            );
+          })}
+        </div>
+
         <motion.div
-          key={`blog-${currentPage}`}
+          key={`blog-${currentPage}-${activeFolder ?? 'all'}`}
           initial="hidden"
           animate="show"
           variants={gridVariants}
           className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 w-full"
         >
-        {posts.map((post) => (
+        {posts.map((post, index) => (
         <Link
           key={post.slug}
           href={`/blog/${post.slug}`}
@@ -133,7 +179,7 @@ export default function BlogListClient({ posts, currentPage, totalPages }: BlogL
                   src={post.meta.cover || '/images/default-cover.svg'}
                   alt={post.meta.title}
                   fill
-                  preload
+                  preload={index < 2}
                   className="object-cover transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-106"
                 />
               </div>
