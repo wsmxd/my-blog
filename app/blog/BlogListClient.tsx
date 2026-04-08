@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import PrefixedImage from '../components/PrefixedImage';
 import { useEffect, useState } from 'react';
 import type { Post } from '../../lib/posts';
@@ -20,6 +21,7 @@ interface BlogListClientProps {
 
 export default function BlogListClient({ posts, currentPage, totalPages, folders = [], activeFolder }: BlogListClientProps) {
   const prefersReducedMotion = useReducedMotion();
+  const router = useRouter();
   const [reads, setReads] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -56,6 +58,14 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
       clearInterval(id);
     };
   }, []);
+
+  useEffect(() => {
+    const hrefs = ['/blog', ...folders.map((folder) => `/blog?folder=${encodeURIComponent(folder)}`)];
+
+    hrefs.forEach((href) => {
+      router.prefetch(href);
+    });
+  }, [folders, router]);
 
   const getPageHref = (page: number) => {
     const folderQuery = activeFolder ? `?folder=${encodeURIComponent(activeFolder)}` : '';
@@ -116,6 +126,10 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
               <Link
                 key={folder}
                 href={href}
+                prefetch
+                onMouseEnter={() => {
+                  router.prefetch(href);
+                }}
                 className={`inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 border ${
                   isActive
                     ? 'border-transparent text-white shadow-lg'
