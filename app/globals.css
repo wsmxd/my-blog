@@ -266,11 +266,43 @@ html.theme-animating *::after {
   margin: 1.5em 0;
   border-radius: 8px;
   overflow-x: auto;
+  padding: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.04);
 }
 
 .markdown-body pre code {
   background: transparent;
   padding: 0;
+}
+
+.dark .markdown-body pre {
+  border-color: rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.markdown-body pre code[data-theme],
+.markdown-body pre code[data-theme] span {
+  color: inherit;
+  background-color: transparent;
+}
+
+.markdown-body .heading-anchor {
+  margin-left: 0.45rem;
+  opacity: 0;
+  text-decoration: none;
+  border-bottom: 0;
+  color: var(--muted-foreground);
+  transition: opacity 0.2s ease;
+}
+
+.markdown-body h1:hover .heading-anchor,
+.markdown-body h2:hover .heading-anchor,
+.markdown-body h3:hover .heading-anchor,
+.markdown-body h4:hover .heading-anchor,
+.markdown-body h5:hover .heading-anchor,
+.markdown-body h6:hover .heading-anchor {
+  opacity: 1;
 }
 
 .markdown-body strong {

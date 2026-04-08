@@ -1,20 +1,12 @@
-"use client";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import rehypeHighlight from "rehype-highlight";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import CustomImg from "./CustomImg";
 
-type CodeRendererProps = {
-  node?: unknown;
-  inline?: boolean;
-  className?: string;
-  children: React.ReactNode;
-};
-
-const syntaxTheme = oneDark as unknown as { [key: string]: React.CSSProperties };
+const rehypeHighlightPlugin = rehypeHighlight as any;
 
 export default function MarkdownRenderer({ content }: { content: string }) {
   return (
@@ -23,38 +15,26 @@ export default function MarkdownRenderer({ content }: { content: string }) {
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
+          rehypeSlug,
           [
-            rehypeSanitize,
+            rehypeAutolinkHeadings,
             {
-              ...defaultSchema,
-              attributes: {
-                ...defaultSchema.attributes,
-                code: [...(defaultSchema.attributes?.code || []), "className"],
-                pre:  [...(defaultSchema.attributes?.pre  || []), "className"],
+              behavior: "append",
+              properties: {
+                className: ["heading-anchor"],
+                ariaLabel: "Link to this section",
+              },
+              content: {
+                type: "text",
+                value: " #",
               },
             },
           ],
+          rehypeHighlightPlugin,
         ]}
         components={{
-          code({ inline, className, children }: CodeRendererProps) {
-            const match = /language-(\w+)/.exec(className || "");
-            if (!inline && match) {
-              return (
-                <SyntaxHighlighter
-                  style={syntaxTheme}
-                  language={match[1]}
-                  PreTag="div"
-                >
-                  {String(children).replace(/\n$/, "")}
-                </SyntaxHighlighter>
-              );
-            }
-            return <code className={className}>{children}</code>;
-          },
           img({ src, alt }: { src?: string; alt?: string; width?: string | number; height?: string | number }) {
-            return (
-              CustomImg({ src, alt })
-            );
+            return <CustomImg src={src} alt={alt} />;
           },
         }}
       >
