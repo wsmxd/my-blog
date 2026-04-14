@@ -154,6 +154,7 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
         <Link
           key={post.slug}
           href={`/blog/${post.slug}`}
+          className="block h-full"
           onClick={() => {
             try {
               fetch(`/api/read/${encodeURIComponent(post.slug)}`, {
@@ -182,12 +183,12 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
                     boxShadow: '0 20px 46px -26px rgba(56, 189, 248, 0.55)',
                   }
             }
-            className="group relative p-6 border border-(--card-border) rounded-2xl bg-(--surface-soft) backdrop-blur-md shadow-lg hover:shadow-2xl transition-[transform,box-shadow,border-color,background-color] duration-260 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden cursor-pointer h-full flex flex-col will-change-transform"
+              className="group relative p-6 border border-(--card-border) rounded-2xl bg-(--surface-soft) backdrop-blur-md shadow-lg hover:shadow-2xl transition-[transform,box-shadow,border-color,background-color] duration-260 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden cursor-pointer h-full min-h-[420px] flex flex-col will-change-transform"
           >
             <div className="absolute inset-0 bg-linear-to-r from-blue-500/0 via-purple-500/5 to-pink-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-260 ease-out pointer-events-none" />
             <div className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/15 to-transparent opacity-0 group-hover:translate-x-full group-hover:opacity-100 transition-[transform,opacity] duration-340 ease-[cubic-bezier(0.22,1,0.36,1)]" />
             
-            <div className="relative w-full aspect-video mb-4 rounded-xl overflow-hidden bg-linear-to-br from-blue-900/20 to-purple-900/20">
+            <div className="relative w-full aspect-[4/3] mb-4 rounded-xl overflow-hidden bg-linear-to-br from-blue-900/20 to-purple-900/20">
               <div className="relative w-full h-full overflow-hidden">
                 <PrefixedImage
                   src={post.meta.cover || '/images/default-cover.svg'}
@@ -199,7 +200,7 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
               </div>
             </div>
             
-            <h2 className="text-xl font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-blue-500 transition-colors duration-260">
+            <h2 className="text-xl font-semibold text-foreground mb-2 min-h-[2.75rem] line-clamp-2 group-hover:text-blue-500 transition-colors duration-260">
               {post.meta.title}
             </h2>
             
@@ -210,13 +211,13 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
               {post.meta.date || '日期未知'}
             </p>
             
-            <p className="text-(--muted-foreground) text-sm leading-relaxed mb-4 line-clamp-3">
+            <p className="text-(--muted-foreground) text-sm leading-relaxed mb-4 min-h-[2.75rem] line-clamp-2">
               {post.meta.description || '暂无描述'}
             </p>
             
             <div className="flex items-center justify-between text-sm pt-4 border-t border-(--card-border) mt-auto">
               <div className="flex-1 mr-2">
-                <TagBadge tags={post.meta.tags} maxTags={3} />
+                <TagBadge tags={post.meta.tags} maxTags={2} />
               </div>
               <div className="text-(--muted-foreground) text-sm flex items-center gap-1 shrink-0">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

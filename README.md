@@ -13,13 +13,13 @@
 1. 安装依赖
 
 ```powershell
-npm install
+pnpm install
 ```
 
 2. 本地启动
 
 ```powershell
-npm run dev
+pnpm dev
 ```
 
 文章位置
@@ -41,10 +41,10 @@ npm run dev
 
 1. 在 Vercel 中导入该仓库。
 2. 在 Vercel 项目设置 -> Environment Variables 中添加上面 4 个 Giscus 环境变量。
-3. 部署（Vercel 会自动运行 `npm install && npm run build`）。
+3. 部署（Vercel 会自动运行 `pnpm install && pnpm build`）。
 
 注意事项
-- 添加或修改依赖后请运行 `npm install`。
+- 添加或修改依赖后请运行 `pnpm install`。
 - 若想改善样式，建议启用 Tailwind 的 typography 插件以获得更好的 `prose` 样式。
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
@@ -75,8 +75,39 @@ npx --yes wrangler secret put UPLOAD_TOKEN --config worker/wrangler.toml
 ### Worker commands
 
 ```bash
-npm run worker:dev
-npm run worker:deploy
+pnpm worker:dev
+pnpm worker:deploy
+```
+
+### curl 上传示例
+
+本地开发时，只要相关环境变量已经配置好，就可以直接用 `curl` 走同一套 API。
+
+上传图片到 `/api/avatar/upload`：
+
+```bash
+curl -X POST "http://localhost:3000/api/avatar/upload?filename=test.png" \
+	-H "Authorization: Bearer $UPLOAD_API_TOKEN" \
+	-H "Content-Type: image/png" \
+	--data-binary @./test.png
+```
+
+上传视频到 `/api/videos/upload`：
+
+```bash
+curl -X POST "http://localhost:3000/api/videos/upload?filename=test.mp4" \
+	-H "Authorization: Bearer $VIDEO_UPLOAD_TOKEN" \
+	-H "Content-Type: video/mp4" \
+	--data-binary @./test.mp4
+```
+
+如果想直接打到 Worker，也可以用：
+
+```bash
+curl -X POST "$WORKER_UPLOAD_URL/upload?filename=test.mp4" \
+	-H "Authorization: Bearer $UPLOAD_TOKEN" \
+	-H "Content-Type: video/mp4" \
+	--data-binary @./test.mp4
 ```
 
 ## Getting Started
