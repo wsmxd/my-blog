@@ -14,7 +14,7 @@ export default function HomeContent({ postsCount, totalReads, videosCount }: Hom
   const features = ["🚀 快速加载", "📱 响应式", "🎨 现代化", "📝 Markdown"];
 
   return (
-    <section className="text-center space-y-8 max-w-2xl mx-auto px-6 relative z-10">
+    <section className="text-center space-y-6 max-w-2xl mx-auto px-6 relative z-10">
       {/* 主标题 */}
       <motion.div
         initial={{ opacity: 0, y: 24 }}
@@ -93,7 +93,7 @@ export default function HomeContent({ postsCount, totalReads, videosCount }: Hom
       </motion.div>
 
       {/* CTA 按钮 */}
-      <div className="pt-6">
+      <div className="pt-2">
         <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -118,7 +118,7 @@ export default function HomeContent({ postsCount, totalReads, videosCount }: Hom
       </div>
 
       {/* 统计数据 */}
-      <div className="flex justify-center gap-6 pt-8 flex-wrap">
+      <div className="flex justify-center gap-6 pt-6 flex-wrap">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
