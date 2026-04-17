@@ -34,7 +34,10 @@ export default async function ScriptsPage() {
                 className="block rounded-xl border border-(--card-border) bg-(--surface-soft) px-5 py-4 hover:bg-(--surface-strong) transition-colors"
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="text-lg font-semibold text-foreground">{script.meta.title}</h2>
+                  <div className="min-w-0">
+                    <h2 className="text-lg font-semibold text-foreground">{script.meta.title}</h2>
+                    <p className="mt-1 text-xs text-(--muted-foreground)">{script.meta.date || '日期未知'}</p>
+                  </div>
                   <TagBadge tags={script.meta.tags} maxTags={4} />
                 </div>
               </Link>
