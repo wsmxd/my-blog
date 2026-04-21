@@ -233,36 +233,44 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
         </motion.div>
       </div>
 
-      {totalPages > 1 && (
-        <div className="mx-auto w-full max-w-6xl px-4 flex justify-center items-center gap-2 mt-10">
+    {totalPages > 1 && (
+      <div className="mx-auto w-full max-w-6xl px-4 mt-10 overflow-hidden">
+        <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-2">
+          
+          {/* 上一页按钮 */}
           <motion.div
-            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            className="flex-shrink-0 hover:scale-105 transition-transform duration-200"
           >
             {currentPage === 1 ? (
-              <span
-                className="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground)/70 cursor-not-allowed border border-(--card-border)"
-              >
-                ← 上一页
+              <span className="flex items-center gap-1 px-3 py-2 sm:px-4 rounded-lg text-sm font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground)/70 cursor-not-allowed border border-(--card-border)">
+                <span aria-hidden="true">←</span>
+                <span className="hidden sm:inline">上一页</span>
               </span>
             ) : (
               <Link
                 href={getPageHref(currentPage - 1)}
-                className="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)"
+                className="flex items-center gap-1 px-3 py-2 sm:px-4 rounded-lg text-sm font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)"
               >
-                ← 上一页
+                <span aria-hidden="true">←</span>
+                <span className="hidden sm:inline">上一页</span>
               </Link>
             )}
           </motion.div>
 
-          <div className="flex gap-2">
+          {/* 页码数字区域 */}
+          <div className="flex flex-wrap justify-center items-center gap-2">
             {pageNumbers.map((page) => (
-              <motion.div key={page} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+              // 核心修改：移除 whileHover，改用 CSS hover:scale-110
+              <div
+                key={page}
+                className="hover:scale-110 transition-transform duration-200 flex-shrink-0"
+              >
                 <Link
                   href={getPageHref(page)}
                   style={currentPage === page ? activeButtonStyle : undefined}
                   aria-current={currentPage === page ? 'page' : undefined}
-                  className={`w-10 h-10 rounded-lg font-semibold transition-all duration-300 inline-flex items-center justify-center ${
+                  className={`min-w-[2.5rem] h-10 px-2 rounded-lg text-sm font-semibold transition-all duration-300 inline-flex items-center justify-center ${
                     currentPage === page
                       ? 'text-white border border-transparent'
                       : 'bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)'
@@ -270,28 +278,33 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
                 >
                   {page}
                 </Link>
-              </motion.div>
+              </div>
             ))}
           </div>
 
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          {/* 下一页按钮 */}
+          <motion.div
+            whileTap={{ scale: 0.95 }}
+            className="flex-shrink-0 hover:scale-105 transition-transform duration-200"
+          >
             {currentPage === totalPages ? (
-              <span
-                className="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground)/70 cursor-not-allowed border border-(--card-border)"
-              >
-                下一页 →
+              <span className="flex items-center gap-1 px-3 py-2 sm:px-4 rounded-lg text-sm font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground)/70 cursor-not-allowed border border-(--card-border)">
+                <span className="hidden sm:inline">下一页</span>
+                <span aria-hidden="true">→</span>
               </span>
             ) : (
               <Link
                 href={getPageHref(currentPage + 1)}
-                className="px-4 py-2 rounded-lg font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)"
+                className="flex items-center gap-1 px-3 py-2 sm:px-4 rounded-lg text-sm font-semibold transition-all duration-300 bg-(--surface-soft) text-(--muted-foreground) hover:bg-(--surface-strong) border border-(--card-border)"
               >
-                下一页 →
+                <span className="hidden sm:inline">下一页</span>
+                <span aria-hidden="true">→</span>
               </Link>
             )}
           </motion.div>
         </div>
-      )}
+      </div>
+    )}
     </section>
   );
 }
