@@ -44,6 +44,23 @@ html.light {
   --article-title-from: #e2e8f0;
   --article-title-via: #3b82f6;
   --article-title-to: #7c3aed;
+  --hljs-fg: #24292e;
+  --hljs-bg: #f6f8fa;
+  --hljs-comment: #6a737d;
+  --hljs-keyword: #d73a49;
+  --hljs-title: #6f42c1;
+  --hljs-constant: #005cc5;
+  --hljs-string: #032f62;
+  --hljs-built-in: #e36209;
+  --hljs-entity: #22863a;
+  --hljs-subst: #24292e;
+  --hljs-section: #005cc5;
+  --hljs-bullet: #735c0f;
+  --hljs-addition-fg: #22863a;
+  --hljs-addition-bg: #f0fff4;
+  --hljs-deletion-fg: #b31d28;
+  --hljs-deletion-bg: #ffeef0;
+  --hljs-pre-bg: rgba(246, 248, 250, 0.96);
 }
 
 .dark {
@@ -72,6 +89,23 @@ html.light {
   --article-title-from: #f1f5f9;
   --article-title-via: #60a5fa;
   --article-title-to: #c084fc;
+  --hljs-fg: #c9d1d9;
+  --hljs-bg: #0d1117;
+  --hljs-comment: #8b949e;
+  --hljs-keyword: #ff7b72;
+  --hljs-title: #d2a8ff;
+  --hljs-constant: #79c0ff;
+  --hljs-string: #a5d6ff;
+  --hljs-built-in: #ffa657;
+  --hljs-entity: #7ee787;
+  --hljs-subst: #c9d1d9;
+  --hljs-section: #1f6feb;
+  --hljs-bullet: #f2cc60;
+  --hljs-addition-fg: #aff5b4;
+  --hljs-addition-bg: #033a16;
+  --hljs-deletion-fg: #ffdcd7;
+  --hljs-deletion-bg: #67060c;
+  --hljs-pre-bg: rgba(13, 17, 23, 0.9);
 }
 
 @theme inline {
@@ -98,6 +132,28 @@ html.light {
     --hero-gradient-start: #050816;
     --hero-gradient-mid: #111827;
     --hero-gradient-end: #1e1b4b;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.dark):not(.light) {
+    --hljs-fg: #c9d1d9;
+    --hljs-bg: #0d1117;
+    --hljs-comment: #8b949e;
+    --hljs-keyword: #ff7b72;
+    --hljs-title: #d2a8ff;
+    --hljs-constant: #79c0ff;
+    --hljs-string: #a5d6ff;
+    --hljs-built-in: #ffa657;
+    --hljs-entity: #7ee787;
+    --hljs-subst: #c9d1d9;
+    --hljs-section: #1f6feb;
+    --hljs-bullet: #f2cc60;
+    --hljs-addition-fg: #aff5b4;
+    --hljs-addition-bg: #033a16;
+    --hljs-deletion-fg: #ffdcd7;
+    --hljs-deletion-bg: #67060c;
+    --hljs-pre-bg: rgba(13, 17, 23, 0.9);
   }
 }
 
@@ -157,6 +213,22 @@ html.theme-animating *::after {
   max-width: 65ch;
 }
 
+.prose-container {
+  padding-top: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .prose-container {
+    padding-top: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .prose-container {
+    padding-top: 2.5rem;
+  }
+}
+
 .card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -186,6 +258,10 @@ html.theme-animating *::after {
   transition: color 0.5s ease;
 }
 
+.markdown-body > :first-child {
+  margin-top: 0;
+}
+
 /* 标题只控制大小和间距，颜色继承 */
 .markdown-body h1,
 .markdown-body h2,
@@ -204,16 +280,16 @@ html.theme-animating *::after {
 .markdown-body h1 { 
   font-size: 2.5rem; 
   line-height: 2.75rem; 
-  margin-top: 3em; 
-  margin-bottom: 1.2em;
+  margin-top: 2.2em; 
+  margin-bottom: 0.9em;
   padding-bottom: 0.5em;
   border-bottom: 2px solid rgba(148, 163, 184, 0.2);
 }
 .markdown-body h2 { 
   font-size: 2rem; 
   line-height: 2.5rem; 
-  margin-top: 2.5em; 
-  margin-bottom: 1em;
+  margin-top: 2em; 
+  margin-bottom: 0.8em;
   padding-bottom: 0.3em;
   border-bottom: 1px solid rgba(148, 163, 184, 0.15);
 }
@@ -245,7 +321,7 @@ html.theme-animating *::after {
 /* 其他样式保持不变（列表、段落等） */
 
 .markdown-body p {
-  margin-bottom: 1.25em;
+  margin-bottom: 1em;
   line-height: 1.8;
 }
 
@@ -263,12 +339,12 @@ html.theme-animating *::after {
 }
 
 .markdown-body pre {
-  margin: 1.5em 0;
+  margin: 1.1em 0;
   border-radius: 8px;
   overflow-x: auto;
   padding: 1rem;
   border: 1px solid rgba(148, 163, 184, 0.2);
-  background: rgba(15, 23, 42, 0.04);
+  background: var(--hljs-pre-bg);
 }
 
 .markdown-body pre code {
@@ -278,13 +354,99 @@ html.theme-animating *::after {
 
 .dark .markdown-body pre {
   border-color: rgba(148, 163, 184, 0.25);
-  background: rgba(15, 23, 42, 0.45);
 }
 
-.markdown-body pre code[data-theme],
-.markdown-body pre code[data-theme] span {
-  color: inherit;
-  background-color: transparent;
+.markdown-body pre code.hljs {
+  display: block;
+  color: var(--hljs-fg);
+  background: transparent;
+}
+
+.markdown-body .hljs {
+  color: var(--hljs-fg);
+}
+
+.markdown-body .hljs-comment,
+.markdown-body .hljs-quote {
+  color: var(--hljs-comment);
+}
+
+.markdown-body .hljs-keyword,
+.markdown-body .hljs-doctag,
+.markdown-body .hljs-meta .hljs-keyword,
+.markdown-body .hljs-template-tag,
+.markdown-body .hljs-template-variable,
+.markdown-body .hljs-type,
+.markdown-body .hljs-variable.language_ {
+  color: var(--hljs-keyword);
+}
+
+.markdown-body .hljs-title,
+.markdown-body .hljs-title.class_,
+.markdown-body .hljs-title.class_.inherited__,
+.markdown-body .hljs-title.function_ {
+  color: var(--hljs-title);
+}
+
+.markdown-body .hljs-attr,
+.markdown-body .hljs-attribute,
+.markdown-body .hljs-literal,
+.markdown-body .hljs-meta,
+.markdown-body .hljs-number,
+.markdown-body .hljs-operator,
+.markdown-body .hljs-variable,
+.markdown-body .hljs-selector-attr,
+.markdown-body .hljs-selector-class,
+.markdown-body .hljs-selector-id {
+  color: var(--hljs-constant);
+}
+
+.markdown-body .hljs-regexp,
+.markdown-body .hljs-string,
+.markdown-body .hljs-meta .hljs-string {
+  color: var(--hljs-string);
+}
+
+.markdown-body .hljs-built_in,
+.markdown-body .hljs-symbol {
+  color: var(--hljs-built-in);
+}
+
+.markdown-body .hljs-name,
+.markdown-body .hljs-selector-tag,
+.markdown-body .hljs-selector-pseudo {
+  color: var(--hljs-entity);
+}
+
+.markdown-body .hljs-subst {
+  color: var(--hljs-subst);
+}
+
+.markdown-body .hljs-section {
+  color: var(--hljs-section);
+  font-weight: 700;
+}
+
+.markdown-body .hljs-bullet {
+  color: var(--hljs-bullet);
+}
+
+.markdown-body .hljs-emphasis {
+  font-style: italic;
+}
+
+.markdown-body .hljs-strong {
+  font-weight: 700;
+}
+
+.markdown-body .hljs-addition {
+  color: var(--hljs-addition-fg);
+  background-color: var(--hljs-addition-bg);
+}
+
+.markdown-body .hljs-deletion {
+  color: var(--hljs-deletion-fg);
+  background-color: var(--hljs-deletion-bg);
 }
 
 .markdown-body .heading-anchor {
@@ -320,7 +482,7 @@ html.theme-animating *::after {
 .markdown-body blockquote {
   border-left: 4px solid #3b82f6;
   padding-left: 1em;
-  margin: 1.5em 0;
+  margin: 1.1em 0;
   color: var(--muted-foreground);
   font-style: italic;
   transition: color 0.5s ease, border-color 0.5s ease;
