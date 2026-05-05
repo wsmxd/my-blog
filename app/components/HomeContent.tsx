@@ -14,7 +14,7 @@ export default function HomeContent({ postsCount, totalReads, videosCount }: Hom
   const features = ["🚀 快速加载", "📱 响应式", "🎨 现代化", "📝 Markdown"];
 
   return (
-    <section className="text-center space-y-6 max-w-2xl mx-auto px-6 relative z-10">
+    <section className="text-center space-y-6 max-w-2xl mx-auto px-4 sm:px-6 relative z-10">
       {/* 主标题 */}
       <motion.div
         initial={{ opacity: 0, y: 24 }}
@@ -22,10 +22,10 @@ export default function HomeContent({ postsCount, totalReads, videosCount }: Hom
         transition={{ duration: 0.65, ease: 'easeOut' }}
         className="space-y-4"
       >
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-linear-to-r from-sky-500 via-blue-500 to-cyan-400 bg-clip-text text-transparent drop-shadow-lg animate-float">
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold leading-tight bg-linear-to-r from-sky-500 via-blue-500 to-cyan-400 bg-clip-text text-transparent drop-shadow-lg animate-float">
           欢迎来到 mxd的小窝
         </h1>
-        <p className="text-lg sm:text-xl text-(--muted-foreground) leading-relaxed font-medium">
+        <p className="text-base sm:text-xl text-(--muted-foreground) leading-relaxed font-medium">
           这里记录了基于 <span className="font-bold text-blue-500">Next.js</span> 和{' '}
           <span className="font-bold text-emerald-500">Markdown</span> 的技术分享与生活随笔
         </p>
@@ -118,7 +118,7 @@ export default function HomeContent({ postsCount, totalReads, videosCount }: Hom
       </div>
 
       {/* 统计数据 */}
-      <div className="flex justify-center gap-6 pt-6 flex-wrap">
+      <div className="mx-auto grid w-full max-w-[18rem] justify-items-center grid-cols-1 gap-3 pt-6 sm:max-w-none sm:grid-cols-3 sm:gap-6 sm:justify-items-stretch">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -134,10 +134,10 @@ export default function HomeContent({ postsCount, totalReads, videosCount }: Hom
             }
           }}
           whileTap={{ scale: 0.98 }}
-          className="text-center p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/30 cursor-pointer transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] min-w-[140px] will-change-transform"
+          className="w-full max-w-[18rem] text-center p-4 sm:max-w-none sm:p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/30 cursor-pointer transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
         >
-          <div className="text-4xl font-bold bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">{postsCount}</div>
-          <div className="text-sm mt-2 font-semibold text-(--muted-foreground)">博客文章</div>
+          <div className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">{postsCount}</div>
+          <div className="text-xs sm:text-sm mt-2 font-semibold text-(--muted-foreground)">博客文章</div>
         </motion.div>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -154,10 +154,10 @@ export default function HomeContent({ postsCount, totalReads, videosCount }: Hom
             }
           }}
           whileTap={{ scale: 0.98 }}
-          className="text-center p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/30 cursor-pointer transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] min-w-[140px] will-change-transform"
+          className="w-full max-w-[18rem] text-center p-4 sm:max-w-none sm:p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/30 cursor-pointer transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
         >
-          <div className="text-4xl font-bold bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">{totalReads}</div>
-          <div className="text-sm mt-2 font-semibold text-(--muted-foreground)">阅读量</div>
+          <div className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">{totalReads}</div>
+          <div className="text-xs sm:text-sm mt-2 font-semibold text-(--muted-foreground)">阅读量</div>
         </motion.div>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -174,10 +174,10 @@ export default function HomeContent({ postsCount, totalReads, videosCount }: Hom
             }
           }}
           whileTap={{ scale: 0.98 }}
-          className="text-center p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/30 cursor-pointer transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] min-w-[140px] will-change-transform"
+          className="w-full max-w-[18rem] text-center p-4 sm:max-w-none sm:p-6 rounded-2xl backdrop-blur-lg border-2 border-(--card-border) bg-(--surface-strong) hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/30 cursor-pointer transition-[transform,box-shadow,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform"
         >
-          <div className="text-4xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{videosCount}</div>
-          <div className="text-sm mt-2 font-semibold text-(--muted-foreground)">视频作品</div>
+          <div className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">{videosCount}</div>
+          <div className="text-xs sm:text-sm mt-2 font-semibold text-(--muted-foreground)">视频作品</div>
         </motion.div>
       </div>
     </section>

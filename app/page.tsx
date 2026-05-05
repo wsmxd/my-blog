@@ -18,7 +18,7 @@ export default async function HomePage() {
       <FlowingGradient />
 
       {/* 内容区域 */}
-      <AnimatedSection className="min-h-screen flex items-center justify-center">
+      <AnimatedSection className="min-h-[calc(100vh-5rem)] flex items-start justify-center pt-20 sm:min-h-screen sm:items-center sm:pt-0">
         <HomeContent postsCount={postsCount} totalReads={totalReads} videosCount={videosCount} />
       </AnimatedSection>
     </>
