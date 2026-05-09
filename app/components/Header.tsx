@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import PrefixedImage from './PrefixedImage';
 import ThemeToggle from './ThemeToggle';
@@ -13,9 +14,31 @@ type LatestUpdate = {
   date?: string;
 };
 
+type NavItem = {
+  href: string;
+  label: string;
+  target?: string;
+  rel?: string;
+};
+
+const primaryNavItems: NavItem[] = [
+  { href: '/blog', label: '博客' },
+  { href: '/videos', label: '视频' },
+  { href: '/scripts', label: '脚本' },
+  { href: '/images', label: '图床' },
+  { href: '/upload', label: '上传' },
+  {
+    href: 'https://github.com/wsmxd/my-blog',
+    label: 'GitHub',
+    target: '_blank',
+    rel: 'noopener noreferrer',
+  },
+];
+
 export default function Header() {
   const [latestUpdate, setLatestUpdate] = useState<LatestUpdate | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     let mounted = true;
@@ -133,37 +156,23 @@ export default function Header() {
 
 
         {/* 导航 */}
-        <nav className="hidden items-center space-x-3 text-sm lg:flex lg:space-x-5">
-          <Link
-            href="/blog"
-            className="text-(--muted-foreground) hover:text-blue-500 transition-colors relative group text-base sm:text-lg"
-          >
-            博客
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
-          </Link>
-          <Link
-            href="/videos"
-            className="text-(--muted-foreground) hover:text-blue-500 transition-colors relative group text-base sm:text-lg"
-          >
-            视频
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
-          </Link>
-          <Link
-            href="/scripts"
-            className="text-(--muted-foreground) hover:text-blue-500 transition-colors relative group text-base sm:text-lg"
-          >
-            脚本
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
-          </Link>
-          <Link
-            href="https://github.com/wsmxd/my-blog"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-(--muted-foreground) hover:text-blue-500 transition-colors relative group text-base sm:text-lg"
-          >
-            GitHub
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all group-hover:w-full"></span>
-          </Link>
+        <nav className="hidden items-center gap-2 text-sm lg:flex lg:gap-2.5">
+          {primaryNavItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              target={item.target}
+              rel={item.rel}
+              className={`group inline-flex items-center rounded-full border px-4 py-2 text-base transition-all duration-300 hover:-translate-y-0.5 hover:border-(--header-border) hover:bg-(--surface-soft) hover:text-foreground hover:shadow-sm sm:text-lg ${pathname === item.href ? 'border-(--header-border) bg-(--surface-strong) text-foreground shadow-sm' : 'border-transparent text-(--muted-foreground)'}`}
+                aria-current={pathname === item.href ? 'page' : undefined}
+                data-active={pathname === item.href}
+            >
+              <span className="relative">
+                {item.label}
+                <span className="absolute -bottom-1 left-0 h-0.5 w-0 rounded-full bg-sky-500 transition-all duration-300 group-hover:w-full" />
+              </span>
+            </Link>
+          ))}
           <ThemeToggle />
         </nav>
 
@@ -172,40 +181,46 @@ export default function Header() {
             id="mobile-navigation"
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="lg:hidden rounded-2xl border border-(--header-border) bg-(--surface-soft)/95 p-2 shadow-lg backdrop-blur-md"
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="lg:hidden overflow-hidden rounded-3xl border border-(--header-border) bg-[linear-gradient(180deg,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.7)_100%)] p-2 shadow-[0_20px_50px_-20px_rgba(15,23,42,0.28)] backdrop-blur-xl dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.92)_0%,rgba(15,23,42,0.78)_100%)]"
           >
-            <nav className="flex flex-col gap-1 text-sm">
-              <Link
-                href="/blog"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-base text-(--muted-foreground) transition-colors hover:bg-(--surface-strong) hover:text-blue-500"
-              >
-                博客
-              </Link>
-              <Link
-                href="/videos"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-base text-(--muted-foreground) transition-colors hover:bg-(--surface-strong) hover:text-blue-500"
-              >
-                视频
-              </Link>
-              <Link
-                href="/scripts"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-base text-(--muted-foreground) transition-colors hover:bg-(--surface-strong) hover:text-blue-500"
-              >
-                脚本
-              </Link>
-              <Link
-                href="https://github.com/wsmxd/my-blog"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-xl px-4 py-3 text-base text-(--muted-foreground) transition-colors hover:bg-(--surface-strong) hover:text-blue-500"
-              >
-                GitHub
-              </Link>
+            <nav className="grid gap-2 text-sm">
+              <div className="rounded-2xl border border-(--header-border) bg-(--surface-soft)/85 p-2 shadow-sm">
+                <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-(--muted-foreground)">
+                  站点导航
+                </p>
+                <div className="grid gap-1.5">
+                  {primaryNavItems.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      target={item.target}
+                      rel={item.rel}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`group flex items-center justify-between rounded-2xl border bg-transparent px-4 py-3.5 text-base transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-500/20 hover:bg-(--surface-strong) hover:shadow-[0_10px_24px_-16px_rgba(14,165,233,0.8)] ${pathname === item.href ? 'border-sky-500/20 bg-(--surface-strong) text-foreground shadow-[0_10px_24px_-16px_rgba(14,165,233,0.8)]' : 'border-transparent text-foreground'}`}
+                      aria-current={pathname === item.href ? 'page' : undefined}
+                    >
+                      <span className="flex items-center gap-3">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-500/12 text-sm font-semibold text-sky-500 transition-transform duration-300 group-hover:scale-105">
+                          {item.label.slice(0, 1)}
+                        </span>
+                        <span className="font-medium tracking-wide">{item.label}</span>
+                      </span>
+                      <span className="text-xs text-(--muted-foreground) transition-transform duration-300 group-hover:translate-x-0.5">
+                        {item.href.startsWith('http') ? '外部' : '进入'}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between rounded-2xl border border-(--header-border) bg-(--surface-soft)/70 px-4 py-3 shadow-sm">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-(--muted-foreground)">主题</p>
+                  <p className="text-sm text-foreground/90">切换浅色 / 深色</p>
+                </div>
+                <ThemeToggle />
+              </div>
             </nav>
           </motion.div>
         ) : null}

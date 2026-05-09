@@ -24,6 +24,19 @@ if (customMediaDomain) {
   }
 }
 
+const publicBaseUrl = process.env.PUBLIC_BASE_URL;
+if (publicBaseUrl) {
+  try {
+    const parsed = new URL(publicBaseUrl);
+    remotePatterns.push({
+      protocol: parsed.protocol.replace(':', '') as 'http' | 'https',
+      hostname: parsed.hostname,
+    });
+  } catch {
+    // ignore invalid URL to avoid breaking build
+  }
+}
+
 const nextConfig: NextConfig = {
   /* config options here */
   images: {

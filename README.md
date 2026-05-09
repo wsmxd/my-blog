@@ -58,6 +58,17 @@ The video upload API now proxies uploads to a Cloudflare Worker that writes file
 - `VIDEO_UPLOAD_TOKEN`: Shared bearer token used by upload page and worker
 - `VIDEO_UPLOAD_MAX_MB` (optional): Max upload size in MB for Next.js pre-check
 
+### 图床（Vercel Blob）
+
+图片上传接口会优先写入 Cloudflare R2 的图片桶；如果 Cloudflare 上传不可用，会回退到 Vercel Blob 的 `image-bed/` 前缀下。`/upload` 页面会把两边的图片合并显示成图床缩略图。
+
+推荐配置：
+
+- `UPLOAD_API_TOKEN`（可选）：如果配置了，`/api/avatar/upload` 和 `/api/avatar/list` 都会要求同一个 Bearer Token
+- `BLOB_READ_WRITE_TOKEN`：Vercel Blob 读写令牌
+- `WORKER_UPLOAD_URL`：Cloudflare worker 基础地址，图片会使用 `/image-upload` 和 `/images`
+- `PUBLIC_BASE_URL`：Cloudflare 对象存储公开域名，例如 `https://media.wsmxd.top`
+
 ### Required env/secrets for Worker
 
 In `worker/wrangler.toml`:
@@ -65,6 +76,7 @@ In `worker/wrangler.toml`:
 - `ALLOWED_ORIGINS`
 - `PUBLIC_BASE_URL`
 - `MAX_UPLOAD_MB`
+- `IMAGE_BUCKET`（R2 bucket binding，bucket name 可用 `image`）
 
 Set worker secret:
 
@@ -92,6 +104,13 @@ curl -X POST "http://localhost:3000/api/avatar/upload?filename=test.png" \
 	--data-binary @./test.png
 ```
 
+查看图床列表：
+
+```bash
+curl "http://localhost:3000/api/avatar/list?limit=20" \
+	-H "Authorization: Bearer $UPLOAD_API_TOKEN"
+```
+
 上传视频到 `/api/videos/upload`：
 
 ```bash
@@ -108,6 +127,15 @@ curl -X POST "$WORKER_UPLOAD_URL/upload?filename=test.mp4" \
 	-H "Authorization: Bearer $UPLOAD_TOKEN" \
 	-H "Content-Type: video/mp4" \
 	--data-binary @./test.mp4
+```
+
+如果你想单独测试 Cloudflare 图片桶，也可以直接调用 worker：
+
+```bash
+curl -X POST "$WORKER_UPLOAD_URL/image-upload?filename=test.png" \
+	-H "Authorization: Bearer $UPLOAD_API_TOKEN" \
+	-H "Content-Type: image/png" \
+	--data-binary @./test.png
 ```
 
 ## Getting Started

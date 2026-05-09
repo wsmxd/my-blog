@@ -11,6 +11,10 @@ routes = [
 binding = "VIDEO_BUCKET"
 bucket_name = "video"
 
+[[r2_buckets]]
+binding = "IMAGE_BUCKET"
+bucket_name = "image"
+
 [vars]
 # Comma-separated origins allowed to upload
 ALLOWED_ORIGINS = "http://localhost:3000,https://wsmxd.top"
