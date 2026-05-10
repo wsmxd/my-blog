@@ -232,10 +232,8 @@
 }
 
 .reel {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: clamp(13.5rem, calc((100vw - 4.9rem) / 3), 31rem);
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+  display: flex;
+  align-items: stretch;
   gap: 0.75rem;
   width: 100%;
   height: calc(100vh - 11.8rem);
@@ -271,12 +269,14 @@
 }
 
 .reelTile {
-  width: 100%;
+  flex: 0 0 auto;
   height: 100%;
+  max-width: 45vw;
   min-width: 0;
   min-height: 0;
   border-radius: 1.25rem;
   scroll-snap-align: start;
+  aspect-ratio: var(--tile-ratio);
 }
 
 .imageAnchor {
@@ -564,10 +564,13 @@
   }
 
   .reel {
-    grid-auto-columns: clamp(12.5rem, calc((100vw - 2rem) / 2), 24rem);
     height: calc(100vh - 15.5rem);
     min-height: 28rem;
     padding-inline: 0.5rem;
+  }
+
+  .reelTile {
+    max-width: 55vw;
   }
 
   .tileOverlay {
@@ -586,10 +589,14 @@
   }
 
   .reel {
-    grid-auto-columns: minmax(72vw, 1fr);
-    grid-template-rows: repeat(2, minmax(0, 1fr));
     height: calc(100vh - 18rem);
     min-height: 30rem;
+  }
+
+  .reelTile {
+    flex: 0 0 72vw;
+    height: auto;
+    max-width: none;
   }
 
   .actions {

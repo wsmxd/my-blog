@@ -81,6 +81,7 @@ export default function ImagesPage() {
   const [token, setToken] = useState('');
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
+  const [imageSizes, setImageSizes] = useState<Record<string, { w: number; h: number }>>({});
   const sentinelRef = useRef<HTMLDivElement>(null);
   const reelRef = useRef<HTMLElement>(null);
   const cursorRef = useRef<CursorState | null>(null);
@@ -252,6 +253,16 @@ export default function ImagesPage() {
     }
   };
 
+  const handleImageLoad = useCallback((url: string, e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.naturalWidth && img.naturalHeight) {
+      setImageSizes((prev) => {
+        if (prev[url]) return prev;
+        return { ...prev, [url]: { w: img.naturalWidth, h: img.naturalHeight } };
+      });
+    }
+  }, []);
+
   const summaryText = useMemo(() => {
     if (error) return error;
     if (!isInitialized) return '加载中';
@@ -327,13 +338,15 @@ export default function ImagesPage() {
       >
         {items.map((item, index) => {
           const fileName = getFileName(item.pathname);
-          const ratio = frameRatios[index % frameRatios.length];
+          const fallbackRatio = frameRatios[index % frameRatios.length];
+          const detected = imageSizes[item.url];
+          const tileRatio = detected ? `${detected.w} / ${detected.h}` : fallbackRatio;
 
           return (
             <article
               className={mode === 'masonry' ? styles.imageTile : styles.reelTile}
               key={item.url}
-              style={{ '--tile-ratio': ratio, '--rise-delay': `${Math.min(index % PAGE_SIZE, 12) * 42}ms` } as React.CSSProperties}
+              style={{ '--tile-ratio': tileRatio, '--rise-delay': `${Math.min(index % PAGE_SIZE, 12) * 42}ms` } as React.CSSProperties}
             >
               <a href={item.url} target="_blank" rel="noreferrer" className={styles.imageAnchor} aria-label={`打开图片 ${fileName}`}>
                 <PrefixedImage
@@ -343,6 +356,7 @@ export default function ImagesPage() {
                   priority={index < 2}
                   sizes={mode === 'masonry' ? '(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw' : '(max-width: 760px) 86vw, 38vw'}
                   className={styles.image}
+                  onLoad={mode === 'reel' ? (e) => handleImageLoad(item.url, e) : undefined}
                 />
 
                 <span className={styles.sourceMark}>{item.source === 'cloudflare' ? 'R2' : 'Blob'}</span>

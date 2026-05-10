@@ -134,7 +134,7 @@ export default function Header() {
           </div>
         </div>
 
-        <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-6">
+        <div className="hidden lg:flex absolute left-[28%] top-1/2 -translate-y-1/2 px-6">
           {latestUpdate ? (
             <motion.div
               key="latest-update-pill"
