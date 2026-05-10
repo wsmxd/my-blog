@@ -68,6 +68,8 @@ The video upload API now proxies uploads to a Cloudflare Worker that writes file
 - `BLOB_READ_WRITE_TOKEN`：Vercel Blob 读写令牌
 - `WORKER_UPLOAD_URL`：Cloudflare worker 基础地址，图片会使用 `/image-upload` 和 `/images`
 - `PUBLIC_BASE_URL`：Cloudflare 对象存储公开域名，例如 `https://media.wsmxd.top`
+- `IMAGE_PUBLIC_BASE_URL`（可选）：图片公开访问地址。若 `PUBLIC_BASE_URL` 绑定的是视频桶，建议设为 Worker 路由，例如 `https://wsmxd.top/upload-worker`
+- `VIDEO_PUBLIC_BASE_URL`（可选）：视频公开访问地址
 
 ### Required env/secrets for Worker
 
@@ -75,6 +77,8 @@ In `worker/wrangler.toml`:
 
 - `ALLOWED_ORIGINS`
 - `PUBLIC_BASE_URL`
+- `IMAGE_PUBLIC_BASE_URL`（可选）
+- `VIDEO_PUBLIC_BASE_URL`（可选）
 - `MAX_UPLOAD_MB`
 - `IMAGE_BUCKET`（R2 bucket binding，bucket name 可用 `image`）
 

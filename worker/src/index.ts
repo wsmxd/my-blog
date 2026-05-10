@@ -3,6 +3,8 @@ interface Env {
   IMAGE_BUCKET: R2Bucket;
   ALLOWED_ORIGINS?: string;
   PUBLIC_BASE_URL?: string;
+  IMAGE_PUBLIC_BASE_URL?: string;
+  VIDEO_PUBLIC_BASE_URL?: string;
   MAX_UPLOAD_MB?: string;
   UPLOAD_TOKEN?: string;
 }
@@ -68,8 +70,9 @@ function sanitizeFileName(input: string): string {
     .toLowerCase();
 }
 
-function buildPublicUrl(env: Env, key: string): string {
-  const base = (env.PUBLIC_BASE_URL || 'https://media.wsmxd.top').trim();
+function buildPublicUrl(env: Env, key: string, mediaType: 'image' | 'video'): string {
+  const typeBase = mediaType === 'image' ? env.IMAGE_PUBLIC_BASE_URL : env.VIDEO_PUBLIC_BASE_URL;
+  const base = (typeBase || env.PUBLIC_BASE_URL || 'https://media.wsmxd.top').trim();
   return `${base.replace(/\/$/, '')}/${key.replace(/^\/+/, '')}`;
 }
 
@@ -103,8 +106,8 @@ function isUploadPath(pathname: string): boolean {
 
 function toStoredObject(env: Env, key: string, size: number, uploadedAt: Date, etag: string) {
   return {
-    url: buildPublicUrl(env, key),
-    downloadUrl: buildPublicUrl(env, key),
+    url: buildPublicUrl(env, key, 'image'),
+    downloadUrl: buildPublicUrl(env, key, 'image'),
     pathname: key,
     size,
     uploadedAt: uploadedAt.toISOString(),
@@ -124,6 +127,26 @@ const worker = {
     const isImageListPath = url.pathname === '/images' || url.pathname.endsWith('/images');
     const isImageDeletePath = url.pathname === '/image-delete' || url.pathname.endsWith('/image-delete');
     const isVideoUploadPath = !isImageUploadPath && (url.pathname === '/upload' || url.pathname.endsWith('/upload'));
+    const publicImageKey = url.pathname.match(/(?:^|\/)(images\/.+)$/)?.[1];
+    const publicVideoKey = url.pathname.match(/(?:^|\/)(videos\/.+)$/)?.[1];
+
+    if ((request.method === 'GET' || request.method === 'HEAD') && (publicImageKey || publicVideoKey)) {
+      const key = publicImageKey || publicVideoKey || '';
+      const object = publicImageKey
+        ? await env.IMAGE_BUCKET.get(key)
+        : await env.VIDEO_BUCKET.get(key);
+
+      if (!object) {
+        return new Response('Not found', { status: 404, headers: corsHeaders(request, env) });
+      }
+
+      const headers = new Headers(corsHeaders(request, env));
+      object.writeHttpMetadata(headers);
+      headers.set('etag', object.httpEtag);
+      headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+
+      return new Response(request.method === 'HEAD' ? null : object.body, { headers });
+    }
 
     if (isImageListPath && request.method === 'GET') {
       const limitParam = Number(url.searchParams.get('limit') || '60');
@@ -231,7 +254,9 @@ const worker = {
     return json(
       {
         key,
-        url: buildPublicUrl(env, key),
+        pathname: key,
+        url: buildPublicUrl(env, key, isImageUploadPath ? 'image' : 'video'),
+        downloadUrl: buildPublicUrl(env, key, isImageUploadPath ? 'image' : 'video'),
         contentType,
         size: bytes.byteLength,
       },

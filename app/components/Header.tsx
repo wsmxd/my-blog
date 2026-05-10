@@ -62,6 +62,10 @@ export default function Header() {
     };
   }, []);
 
+  if (pathname?.startsWith('/images')) {
+    return null;
+  }
+
   const updateTypeText: Record<'post' | 'video' | 'script', string> = {
     post: '博客',
     video: '视频',

@@ -20,5 +20,10 @@ bucket_name = "image"
 ALLOWED_ORIGINS = "http://localhost:3000,https://wsmxd.top"
 # Public URL prefix for returned object URLs
 PUBLIC_BASE_URL = "https://media.wsmxd.top"
+# Optional per-bucket public URL prefixes. If the shared media domain is bound
+# to only one R2 bucket, point IMAGE_PUBLIC_BASE_URL at a worker route or an
+# image-bucket custom domain to avoid 404s for image objects.
+IMAGE_PUBLIC_BASE_URL = "https://wsmxd.top/upload-worker"
+VIDEO_PUBLIC_BASE_URL = "https://media.wsmxd.top"
 # Max upload size in MB
 MAX_UPLOAD_MB = "200"

@@ -1,0 +1,652 @@
+.page {
+  position: relative;
+  isolation: isolate;
+  width: 100vw;
+  min-height: 100vh;
+  margin: -2.5rem calc(50% - 50vw) -2.5rem;
+  overflow: hidden;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at 16% 10%, rgba(20, 184, 166, 0.28), transparent 28rem),
+    radial-gradient(circle at 84% 6%, rgba(244, 114, 182, 0.22), transparent 24rem),
+    radial-gradient(circle at 76% 78%, rgba(250, 204, 21, 0.14), transparent 24rem),
+    linear-gradient(135deg, #030712 0%, #0f172a 42%, #111827 100%);
+}
+
+.ambientOne,
+.ambientTwo,
+.noise {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+}
+
+.ambientOne {
+  z-index: -3;
+  background:
+    linear-gradient(115deg, transparent 0 18%, rgba(56, 189, 248, 0.12) 26%, transparent 38% 100%),
+    linear-gradient(72deg, transparent 0 52%, rgba(251, 113, 133, 0.12) 62%, transparent 74% 100%);
+  animation: drift 18s ease-in-out infinite alternate;
+}
+
+.ambientTwo {
+  z-index: -2;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 88px 88px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.76), transparent 82%);
+}
+
+.noise {
+  z-index: -1;
+  opacity: 0.32;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px);
+  background-size: 34px 34px, 49px 49px;
+  mix-blend-mode: screen;
+}
+
+.hero {
+  position: sticky;
+  top: 1.25rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(100% - 2rem, 1500px);
+  margin: 0 auto;
+  padding: 0;
+}
+
+.brandBlock,
+.actions,
+.segmented {
+  display: flex;
+  align-items: center;
+}
+
+.brandBlock {
+  min-width: 0;
+  gap: 0.85rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1.35rem;
+  background: rgba(3, 7, 18, 0.48);
+  box-shadow: 0 24px 70px -42px rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(22px) saturate(135%);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.65rem;
+  height: 2.65rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: #06121f;
+  background: linear-gradient(135deg, #f8fafc, #67e8f9 48%, #f9a8d4);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 18px 36px -20px rgba(103, 232, 249, 0.8);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.4rem, 3vw, 2.8rem);
+  line-height: 0.92;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.metaLine {
+  margin: 0.28rem 0 0;
+  color: rgba(226, 232, 240, 0.72);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.actions {
+  justify-content: flex-end;
+  gap: 0.55rem;
+  padding: 0.48rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(3, 7, 18, 0.52);
+  box-shadow: 0 24px 70px -42px rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(22px) saturate(135%);
+}
+
+.segmented {
+  gap: 0.2rem;
+  padding: 0.18rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.segmentButton,
+.ghostButton,
+.primaryButton,
+.tokenField {
+  min-height: 2.6rem;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 850;
+  text-decoration: none;
+  transition:
+    transform 220ms ease,
+    color 220ms ease,
+    background 220ms ease,
+    box-shadow 220ms ease,
+    opacity 220ms ease;
+}
+
+.segmentButton {
+  padding: 0 0.88rem;
+  color: rgba(226, 232, 240, 0.68);
+  background: transparent;
+  cursor: pointer;
+}
+
+.segmentActive {
+  color: #06121f;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 26px -18px rgba(255, 255, 255, 0.7);
+}
+
+.ghostButton {
+  padding: 0 0.98rem;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+}
+
+.ghostButton:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.15rem;
+  color: #06121f;
+  background: linear-gradient(135deg, #67e8f9, #f0abfc 55%, #fde68a);
+  box-shadow: 0 18px 34px -22px rgba(240, 171, 252, 0.9);
+}
+
+.tokenField {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0 0.55rem 0 0.85rem;
+  color: rgba(226, 232, 240, 0.74);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.tokenField input {
+  width: 7.5rem;
+  height: 1.9rem;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0 0.72rem;
+  color: #f8fafc;
+  background: rgba(3, 7, 18, 0.35);
+  font: inherit;
+  font-size: 0.76rem;
+  outline: none;
+}
+
+.tokenField input::placeholder {
+  color: rgba(226, 232, 240, 0.46);
+}
+
+.tokenField input:focus {
+  border-color: rgba(103, 232, 249, 0.58);
+}
+
+.segmentButton:hover,
+.ghostButton:hover,
+.primaryButton:hover,
+.backLink:hover {
+  transform: translateY(-1px);
+}
+
+.masonry {
+  width: min(100% - 1.4rem, 1640px);
+  margin: 0 auto;
+  padding: 1.2rem 0 0;
+  column-count: 4;
+  column-gap: 0.75rem;
+}
+
+.reel {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(13.5rem, calc((100vw - 4.9rem) / 3), 31rem);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+  height: calc(100vh - 11.8rem);
+  min-height: 31rem;
+  max-height: 58rem;
+  margin: 0;
+  padding: 1.2rem max(0.7rem, calc((100vw - 1640px) / 2)) 1.8rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: max(0.7rem, calc((100vw - 1640px) / 2));
+  scrollbar-width: thin;
+}
+
+.imageTile,
+.reelTile {
+  position: relative;
+  overflow: hidden;
+  background: rgba(15, 23, 42, 0.72);
+  box-shadow: 0 30px 90px -52px rgba(0, 0, 0, 0.86);
+  animation: tileRise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--rise-delay);
+  transform: translateZ(0);
+}
+
+.imageTile {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.75rem;
+  break-inside: avoid;
+  border-radius: 1.1rem;
+  aspect-ratio: var(--tile-ratio);
+}
+
+.reelTile {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 1.25rem;
+  scroll-snap-align: start;
+}
+
+.imageAnchor {
+  position: absolute;
+  inset: 0;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.image {
+  object-fit: cover;
+  transform: scale(1.01);
+  filter: saturate(1.06) contrast(1.02);
+  transition:
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sourceMark {
+  position: absolute;
+  top: 0.78rem;
+  left: 0.78rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.45rem;
+  height: 2.05rem;
+  padding: 0 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(3, 7, 18, 0.32);
+  font-size: 0.72rem;
+  font-weight: 900;
+  backdrop-filter: blur(15px);
+}
+
+.tileOverlay {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 54%;
+  padding: 4.25rem 1rem 1rem;
+  opacity: 0;
+  transform: translateY(12px);
+  background: linear-gradient(to top, rgba(3, 7, 18, 0.84), rgba(3, 7, 18, 0.42) 54%, transparent);
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+
+.tileText {
+  min-width: 0;
+}
+
+.tileTitle {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.tileMeta {
+  margin: 0.45rem 0 0;
+  color: rgba(226, 232, 240, 0.78);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.openMark {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.25rem;
+  padding: 0 0.8rem;
+  border-radius: 999px;
+  color: #06121f;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.tileActions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.42rem;
+  flex-wrap: wrap;
+  max-width: min(100%, 18rem);
+}
+
+.tileActions button,
+.tileActions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 0 0.72rem;
+  color: #f8fafc;
+  background: rgba(3, 7, 18, 0.42);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+}
+
+.tileActions button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.tileActions button:last-child {
+  color: #fecaca;
+  border-color: rgba(248, 113, 113, 0.28);
+  background: rgba(127, 29, 29, 0.34);
+}
+
+.imageTile:hover,
+.reelTile:hover,
+.imageTile:focus-within,
+.reelTile:focus-within {
+  box-shadow: 0 46px 110px -52px rgba(6, 182, 212, 0.58);
+}
+
+.imageTile:hover .image,
+.reelTile:hover .image,
+.imageTile:focus-within .image,
+.reelTile:focus-within .image {
+  transform: scale(1.08);
+  filter: saturate(1.22) contrast(1.08);
+}
+
+.imageTile:hover .tileOverlay,
+.reelTile:hover .tileOverlay,
+.imageTile:focus-within .tileOverlay,
+.reelTile:focus-within .tileOverlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sentinel {
+  display: flex;
+  justify-content: center;
+  min-height: 8rem;
+  padding: 2rem 1rem;
+  color: rgba(226, 232, 240, 0.6);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.sentinel span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 6rem;
+  height: 2.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(3, 7, 18, 0.36);
+  backdrop-filter: blur(18px);
+}
+
+.errorText,
+.emptyState {
+  width: min(100% - 2rem, 42rem);
+  margin: 2rem auto 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1.25rem;
+  background: rgba(3, 7, 18, 0.58);
+  backdrop-filter: blur(18px);
+}
+
+.errorText {
+  padding: 1rem;
+  color: #fecaca;
+  font-weight: 750;
+}
+
+.emptyState {
+  display: grid;
+  place-items: center;
+  gap: 0.85rem;
+  min-height: 28rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.emptyState h2 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.emptyState a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 1.2rem;
+  border-radius: 999px;
+  color: #06121f;
+  background: #f8fafc;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+@keyframes tileRise {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-1.5rem, -1rem, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(1.5rem, 1rem, 0) scale(1.05);
+  }
+}
+
+@media (max-width: 1180px) {
+  .masonry {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 860px) {
+  .page {
+    margin-top: -2.5rem;
+  }
+
+  .hero {
+    top: 5rem;
+    align-items: stretch;
+    flex-direction: column;
+    width: min(100% - 1rem, 1500px);
+  }
+
+  .brandBlock,
+  .actions {
+    width: 100%;
+  }
+
+  .brandBlock {
+    justify-content: flex-start;
+  }
+
+  .actions {
+    justify-content: space-between;
+    border-radius: 1.2rem;
+  }
+
+  .masonry {
+    width: min(100% - 0.8rem, 1640px);
+    column-count: 2;
+    column-gap: 0.55rem;
+  }
+
+  .imageTile {
+    margin-bottom: 0.55rem;
+    border-radius: 0.9rem;
+  }
+
+  .reel {
+    grid-auto-columns: clamp(12.5rem, calc((100vw - 2rem) / 2), 24rem);
+    height: calc(100vh - 15.5rem);
+    min-height: 28rem;
+    padding-inline: 0.5rem;
+  }
+
+  .tileOverlay {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    top: 6.5rem;
+  }
+
+  .masonry {
+    column-count: 1;
+  }
+
+  .reel {
+    grid-auto-columns: minmax(72vw, 1fr);
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    height: calc(100vh - 18rem);
+    min-height: 30rem;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.4rem;
+    border-radius: 1.1rem;
+  }
+
+  .segmented {
+    min-width: 0;
+  }
+
+  .tokenField {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    order: 5;
+  }
+
+  .tokenField input {
+    flex: 1;
+    width: auto;
+  }
+
+  .segmentButton,
+  .ghostButton,
+  .primaryButton,
+  .tokenField {
+    min-height: 2.45rem;
+    padding-inline: 0.76rem;
+    font-size: 0.82rem;
+  }
+
+  .tileOverlay {
+    display: grid;
+    align-items: end;
+  }
+
+  .tileActions {
+    justify-content: flex-start;
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambientOne,
+  .imageTile,
+  .reelTile {
+    animation: none;
+  }
+
+  .segmentButton,
+  .ghostButton,
+  .primaryButton,
+  .backLink,
+  .image,
+  .tileOverlay {
+    transition-duration: 0.01ms;
+  }
+}

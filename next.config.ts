@@ -9,6 +9,10 @@ const remotePatterns: NonNullable<NextConfig['images']>['remotePatterns'] = [
     protocol: 'https',
     hostname: '**.r2.cloudflarestorage.com',
   },
+  {
+    protocol: 'https',
+    hostname: 'wsmxd.top',
+  },
 ];
 
 const customMediaDomain = process.env.R2_CUSTOM_DOMAIN;
@@ -34,6 +38,20 @@ if (publicBaseUrl) {
     });
   } catch {
     // ignore invalid URL to avoid breaking build
+  }
+}
+
+for (const mediaBaseUrl of [process.env.IMAGE_PUBLIC_BASE_URL, process.env.VIDEO_PUBLIC_BASE_URL]) {
+  if (mediaBaseUrl) {
+    try {
+      const parsed = new URL(mediaBaseUrl);
+      remotePatterns.push({
+        protocol: parsed.protocol.replace(':', '') as 'http' | 'https',
+        hostname: parsed.hostname,
+      });
+    } catch {
+      // ignore invalid URL to avoid breaking build
+    }
   }
 }
 
