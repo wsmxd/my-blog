@@ -18,6 +18,7 @@ export default function AvatarUploadPage() {
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [token, setToken] = useState<string>('');
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const helpText = useMemo(
     () =>
@@ -55,6 +56,52 @@ export default function AvatarUploadPage() {
   const resetState = () => {
     setError(null);
     setBlobs([]);
+    setFileNames([]);
+    if (inputFileRef.current) {
+      inputFileRef.current.value = '';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'].includes(f.type),
+    );
+
+    if (files.length === 0) {
+      setError('请拖入 JPG / PNG / WEBP / GIF / AVIF 格式的图片');
+      return;
+    }
+
+    if (files.length > MAX_FILES) {
+      setError(`一次最多上传 ${MAX_FILES} 张图片`);
+      return;
+    }
+
+    setError(null);
+    setFileNames(files.map((f) => f.name));
+
+    // 将拖入的文件写入隐藏的 file input
+    const dataTransfer = new DataTransfer();
+    files.forEach((f) => dataTransfer.items.add(f));
+    if (inputFileRef.current) {
+      inputFileRef.current.files = dataTransfer.files;
+    }
   };
   return (
     <main style={styles.page}>
@@ -71,7 +118,8 @@ export default function AvatarUploadPage() {
           style={styles.form}
           onSubmit={async (event) => {
             event.preventDefault();
-            resetState();
+            setError(null);
+            setBlobs([]);
 
             const fileList = inputFileRef.current?.files;
 
@@ -135,13 +183,24 @@ export default function AvatarUploadPage() {
             />
           </label>
 
-          <label style={styles.dropzone}>
+          <label
+            style={{
+              ...styles.dropzone,
+              ...(isDragOver
+                ? { borderColor: 'rgba(96,165,250,0.7)', background: 'rgba(96,165,250,0.08)' }
+                : {}),
+            }}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             <input
               name="file"
               ref={inputFileRef}
               type="file"
               multiple
-              accept="image/jpeg, image/png, image/webp"
+              accept="image/jpeg, image/png, image/webp, image/gif, image/avif"
               onChange={handleFileChange}
               required
               style={styles.hiddenInput}
@@ -159,9 +218,19 @@ export default function AvatarUploadPage() {
 
           <div style={styles.actions}>
             <small style={{ ...styles.help, color: error ? '#fca5a5' : '#9ca3af' }}>{helpText}</small>
-            <button style={styles.button} type="submit" disabled={isUploading}>
-              {isUploading ? '上传中...' : '开始上传'}
-            </button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                style={{ ...styles.button, background: 'rgba(148,163,184,0.15)', color: '#cbd5e1' }}
+                type="button"
+                onClick={resetState}
+                disabled={isUploading}
+              >
+                清空
+              </button>
+              <button style={styles.button} type="submit" disabled={isUploading}>
+                {isUploading ? '上传中...' : '开始上传'}
+              </button>
+            </div>
           </div>
         </form>
 
@@ -230,7 +299,9 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 16,
   },
   dropzone: {
-    border: '2px dashed rgba(148,163,184,0.35)',
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: 'rgba(148,163,184,0.35)',
     borderRadius: 16,
     padding: 16,
     background: 'rgba(148,163,184,0.05)',

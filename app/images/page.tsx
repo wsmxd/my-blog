@@ -27,6 +27,27 @@ type PreviewImage = GalleryBlob & {
 const PAGE_SIZE = 30;
 const frameRatios = ['4 / 5', '1 / 1', '3 / 4', '5 / 7', '4 / 3', '2 / 3'];
 
+function parseAspectRatio(value: string): number {
+  const [widthPart, heightPart] = value.split('/').map((part) => Number(part.trim()));
+  if (!Number.isFinite(widthPart) || !Number.isFinite(heightPart) || heightPart <= 0) {
+    return 1;
+  }
+
+  return widthPart / heightPart;
+}
+
+function softCompressAspectRatio(ratio: number): number {
+  if (ratio <= 1) {
+    return ratio;
+  }
+
+  return 1 + (ratio - 1) * 0.45;
+}
+
+function formatAspectRatio(value: number): string {
+  return `${Math.max(value, 0.2).toFixed(3)} / 1`;
+}
+
 function buildAuthHeaders(tokenValue: string): HeadersInit {
   const value = tokenValue.trim();
   return value ? { Authorization: `Bearer ${value}` } : {};
@@ -351,7 +372,8 @@ export default function ImagesPage() {
           const fileName = getFileName(item.pathname);
           const fallbackRatio = frameRatios[index % frameRatios.length];
           const detected = imageSizes[item.url];
-          const tileRatio = detected ? `${detected.w} / ${detected.h}` : fallbackRatio;
+          const sourceRatio = detected ? detected.w / detected.h : parseAspectRatio(fallbackRatio);
+          const tileRatio = formatAspectRatio(softCompressAspectRatio(sourceRatio));
 
           return (
             <article
