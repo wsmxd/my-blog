@@ -20,7 +20,9 @@ type CursorState = {
   cloudflare?: string;
 };
 
-type ViewMode = 'masonry' | 'reel';
+type PreviewImage = GalleryBlob & {
+  fileName: string;
+};
 
 const PAGE_SIZE = 30;
 const frameRatios = ['4 / 5', '1 / 1', '3 / 4', '5 / 7', '4 / 3', '2 / 3'];
@@ -76,17 +78,18 @@ export default function ImagesPage() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [mode, setMode] = useState<ViewMode>('masonry');
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState('');
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
   const [imageSizes, setImageSizes] = useState<Record<string, { w: number; h: number }>>({});
+  const [previewImage, setPreviewImage] = useState<PreviewImage | null>(null);
+  const [previewVisible, setPreviewVisible] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const reelRef = useRef<HTMLElement>(null);
   const cursorRef = useRef<CursorState | null>(null);
   const hasMoreRef = useRef(true);
   const isLoadingRef = useRef(false);
+  const previewCloseTimerRef = useRef<number | null>(null);
 
   const loadPage = useCallback(async (reset = false) => {
     if (isLoadingRef.current) {
@@ -148,6 +151,31 @@ export default function ImagesPage() {
   }, []);
 
   useEffect(() => {
+    if (!previewImage) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setPreviewImage(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [previewImage]);
+
+  useEffect(() => {
+    return () => {
+      if (previewCloseTimerRef.current !== null) {
+        window.clearTimeout(previewCloseTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel || !isInitialized) {
       return;
@@ -175,27 +203,8 @@ export default function ImagesPage() {
     setHasMore(true);
     cursorRef.current = null;
     hasMoreRef.current = true;
-    if (mode === 'reel') {
-      reelRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     await loadPage(true);
-  };
-
-  const handleGalleryScroll = () => {
-    if (mode !== 'reel') {
-      return;
-    }
-
-    const node = reelRef.current;
-    if (!node || isLoadingRef.current || !hasMoreRef.current) {
-      return;
-    }
-
-    if (node.scrollLeft + node.clientWidth >= node.scrollWidth - 900) {
-      void loadPage(false);
-    }
   };
 
   const updateToken = (value: string) => {
@@ -263,6 +272,29 @@ export default function ImagesPage() {
     }
   }, []);
 
+  const openPreview = (item: GalleryBlob, fileName: string) => {
+    if (previewCloseTimerRef.current !== null) {
+      window.clearTimeout(previewCloseTimerRef.current);
+      previewCloseTimerRef.current = null;
+    }
+
+    setPreviewImage({ ...item, fileName });
+    setPreviewVisible(true);
+  };
+
+  const closePreview = () => {
+    setPreviewVisible(false);
+
+    if (previewCloseTimerRef.current !== null) {
+      window.clearTimeout(previewCloseTimerRef.current);
+    }
+
+    previewCloseTimerRef.current = window.setTimeout(() => {
+      setPreviewImage(null);
+      previewCloseTimerRef.current = null;
+    }, 180);
+  };
+
   const summaryText = useMemo(() => {
     if (error) return error;
     if (!isInitialized) return '加载中';
@@ -271,7 +303,7 @@ export default function ImagesPage() {
   }, [error, isInitialized, items.length]);
 
   return (
-    <main className={`${styles.page} ${mode === 'masonry' ? styles.pageScroll : styles.pageFixed}`}>
+    <main className={`${styles.page} ${styles.pageScroll}`}>
       <div className={styles.ambientOne} />
       <div className={styles.ambientTwo} />
       <div className={styles.noise} />
@@ -288,25 +320,6 @@ export default function ImagesPage() {
         </div>
 
         <div className={styles.actions} aria-label="图库操作">
-          <div className={styles.segmented}>
-            <button
-              type="button"
-              className={`${styles.segmentButton} ${mode === 'masonry' ? styles.segmentActive : ''}`}
-              onClick={() => setMode('masonry')}
-              aria-pressed={mode === 'masonry'}
-            >
-              瀑布
-            </button>
-            <button
-              type="button"
-              className={`${styles.segmentButton} ${mode === 'reel' ? styles.segmentActive : ''}`}
-              onClick={() => setMode('reel')}
-              aria-pressed={mode === 'reel'}
-            >
-              横流
-            </button>
-          </div>
-
           <button type="button" className={styles.ghostButton} onClick={() => void refresh()} disabled={isLoading}>
             {isLoading ? '刷新中' : '刷新'}
           </button>
@@ -331,10 +344,8 @@ export default function ImagesPage() {
       {error ? <p className={styles.errorText}>{error}</p> : null}
 
       <section
-        ref={mode === 'reel' ? reelRef : undefined}
-        className={mode === 'masonry' ? styles.masonry : styles.reel}
+        className={styles.masonry}
         aria-live="polite"
-        onScroll={handleGalleryScroll}
       >
         {items.map((item, index) => {
           const fileName = getFileName(item.pathname);
@@ -344,19 +355,30 @@ export default function ImagesPage() {
 
           return (
             <article
-              className={mode === 'masonry' ? styles.imageTile : styles.reelTile}
+              className={styles.imageTile}
               key={item.url}
               style={{ '--tile-ratio': tileRatio, '--rise-delay': `${Math.min(index % PAGE_SIZE, 12) * 42}ms` } as React.CSSProperties}
             >
-              <a href={item.url} target="_blank" rel="noreferrer" className={styles.imageAnchor} aria-label={`打开图片 ${fileName}`}>
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.imageAnchor}
+                aria-label={`预览图片 ${fileName}`}
+                onClick={(event) => {
+                  event.preventDefault();
+                  openPreview(item, fileName);
+                }}
+              >
                 <PrefixedImage
                   src={item.url}
                   alt={fileName}
                   fill
                   priority={index < 2}
-                  sizes={mode === 'masonry' ? '(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw' : '(max-width: 760px) 86vw, 38vw'}
+                  loading={index < 2 ? 'eager' : 'lazy'}
+                  sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw"
                   className={styles.image}
-                  onLoad={mode === 'reel' ? (e) => handleImageLoad(item.url, e) : undefined}
+                  onLoad={(e) => handleImageLoad(item.url, e)}
                 />
 
                 <span className={styles.sourceMark}>{item.source === 'cloudflare' ? 'R2' : 'Blob'}</span>
@@ -395,9 +417,36 @@ export default function ImagesPage() {
         </section>
       ) : null}
 
-      {mode === 'masonry' ? (
-        <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true">
-          <span>{isLoading ? '加载中' : hasMore ? ' ' : '到底了'}</span>
+      <div ref={sentinelRef} className={styles.sentinel} aria-hidden="true">
+        <span>{isLoading ? '加载中' : hasMore ? ' ' : '到底了'}</span>
+      </div>
+
+      {previewImage ? (
+        <div
+          className={`${styles.previewBackdrop} ${previewVisible ? styles.previewBackdropOpen : styles.previewBackdropClosing}`}
+          role="presentation"
+          onPointerDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closePreview();
+            }
+          }}
+        >
+          <div
+            className={`${styles.previewStage} ${previewVisible ? styles.previewStageOpen : styles.previewStageClosing}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`预览图片 ${previewImage.fileName}`}
+            onClick={closePreview}
+          >
+            <PrefixedImage
+              src={previewImage.url}
+              alt={previewImage.fileName}
+              fill
+              priority
+              sizes="(max-width: 960px) 100vw, 92vw"
+              className={styles.previewImage}
+            />
+          </div>
         </div>
       ) : null}
     </main>
