@@ -1,0 +1,8 @@
+.pageScroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.pageFixed {
+  overflow: hidden;
+}

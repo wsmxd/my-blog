@@ -1,16 +1,27 @@
 .page {
-  position: relative;
-  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
   width: 100vw;
-  min-height: 100vh;
-  margin: -2.5rem calc(50% - 50vw) -2.5rem;
-  overflow: hidden;
+  height: 100dvh;
   color: #f8fafc;
+
   background:
     radial-gradient(circle at 16% 10%, rgba(20, 184, 166, 0.28), transparent 28rem),
     radial-gradient(circle at 84% 6%, rgba(244, 114, 182, 0.22), transparent 24rem),
     radial-gradient(circle at 76% 78%, rgba(250, 204, 21, 0.14), transparent 24rem),
     linear-gradient(135deg, #030712 0%, #0f172a 42%, #111827 100%);
+}
+
+.pageScroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.pageFixed {
+  overflow: hidden;
 }
 
 .ambientOne,
@@ -49,15 +60,14 @@
 }
 
 .hero {
-  position: sticky;
-  top: 1.25rem;
+  flex: 0 0 auto;
   z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   width: min(100% - 2rem, 1500px);
-  margin: 0 auto;
+  margin: 0.5rem auto 0;
   padding: 0;
 }
 
@@ -70,8 +80,8 @@
 
 .brandBlock {
   min-width: 0;
-  gap: 0.85rem;
-  padding: 0.55rem 0.7rem;
+  gap: 0.75rem;
+  padding: 0.35rem 0.5rem;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 1.35rem;
   background: rgba(3, 7, 18, 0.48);
@@ -83,13 +93,22 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.65rem;
-  height: 2.65rem;
+  width: 2.2rem;
+  height: 2.2rem;
   flex: 0 0 auto;
   border-radius: 50%;
   color: #06121f;
   background: linear-gradient(135deg, #f8fafc, #67e8f9 48%, #f9a8d4);
-  font-size: 0.78rem;
+}
+
+.pageScroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.pageFixed {
+  overflow: hidden;
+  font-size: 0.75rem;
   font-weight: 900;
   text-decoration: none;
   box-shadow: 0 18px 36px -20px rgba(103, 232, 249, 0.8);
@@ -97,24 +116,24 @@
 
 .title {
   margin: 0;
-  font-size: clamp(1.4rem, 3vw, 2.8rem);
+  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
   line-height: 0.92;
   font-weight: 900;
   letter-spacing: 0;
 }
 
 .metaLine {
-  margin: 0.28rem 0 0;
+  margin: 0.15rem 0 0;
   color: rgba(226, 232, 240, 0.72);
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0;
 }
 
 .actions {
   justify-content: flex-end;
-  gap: 0.55rem;
-  padding: 0.48rem;
+  gap: 0.4rem;
+  padding: 0.35rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
   background: rgba(3, 7, 18, 0.52);
@@ -133,11 +152,11 @@
 .ghostButton,
 .primaryButton,
 .tokenField {
-  min-height: 2.6rem;
+  min-height: 2.2rem;
   border: 0;
   border-radius: 999px;
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 850;
   text-decoration: none;
   transition:
@@ -149,7 +168,7 @@
 }
 
 .segmentButton {
-  padding: 0 0.88rem;
+  padding: 0 0.65rem;
   color: rgba(226, 232, 240, 0.68);
   background: transparent;
   cursor: pointer;
@@ -162,7 +181,7 @@
 }
 
 .ghostButton {
-  padding: 0 0.98rem;
+  padding: 0 0.8rem;
   color: #e2e8f0;
   background: rgba(255, 255, 255, 0.08);
   cursor: pointer;
@@ -177,9 +196,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 1.15rem;
+  padding: 0 0.9rem;
   color: #06121f;
   background: linear-gradient(135deg, #67e8f9, #f0abfc 55%, #fde68a);
+}
+
+.pageScroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.pageFixed {
+  overflow: hidden;
   box-shadow: 0 18px 34px -22px rgba(240, 171, 252, 0.9);
 }
 
@@ -187,10 +215,10 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0 0.55rem 0 0.85rem;
+  padding: 0 0.55rem 0 0.75rem;
   color: rgba(226, 232, 240, 0.74);
   background: rgba(255, 255, 255, 0.08);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 850;
 }
 
@@ -233,12 +261,11 @@
 
 .reel {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   gap: 0.75rem;
   width: 100%;
-  height: calc(100vh - 11.8rem);
-  min-height: 31rem;
-  max-height: 58rem;
+  flex: 1;
+  min-height: 0;
   margin: 0;
   padding: 1.2rem max(0.7rem, calc((100vw - 1640px) / 2)) 1.8rem;
   overflow-x: auto;
@@ -271,12 +298,10 @@
 .reelTile {
   flex: 0 0 auto;
   height: 100%;
-  max-width: 45vw;
-  min-width: 0;
-  min-height: 0;
+  aspect-ratio: var(--tile-ratio);
+  max-width: 80vw;
   border-radius: 1.25rem;
   scroll-snap-align: start;
-  aspect-ratio: var(--tile-ratio);
 }
 
 .imageAnchor {
@@ -528,11 +553,11 @@
 
 @media (max-width: 860px) {
   .page {
-    margin-top: -2.5rem;
+    /* Margin removed because page is fixed now */
   }
 
   .hero {
-    top: 5rem;
+    margin-top: 0.5rem;
     align-items: stretch;
     flex-direction: column;
     width: min(100% - 1rem, 1500px);
@@ -564,7 +589,7 @@
   }
 
   .reel {
-    height: calc(100vh - 15.5rem);
+    flex: 1;
     min-height: 28rem;
     padding-inline: 0.5rem;
   }
@@ -581,7 +606,7 @@
 
 @media (max-width: 560px) {
   .hero {
-    top: 6.5rem;
+    margin-top: 0.5rem;
   }
 
   .masonry {
@@ -589,7 +614,7 @@
   }
 
   .reel {
-    height: calc(100vh - 18rem);
+    flex: 1;
     min-height: 30rem;
   }
 

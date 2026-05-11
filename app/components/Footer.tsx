@@ -1,4 +1,14 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
+
 export default function Footer() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/images')) {
+    return null;
+  }
+
   return (
     <footer className="border-t border-(--header-border) py-8 text-center text-sm text-(--muted-foreground) bg-(--header-bg) backdrop-blur-sm">
       <div className="space-y-2">

@@ -271,7 +271,7 @@ export default function ImagesPage() {
   }, [error, isInitialized, items.length]);
 
   return (
-    <main className={styles.page}>
+    <main className={`${styles.page} ${mode === 'masonry' ? styles.pageScroll : styles.pageFixed}`}>
       <div className={styles.ambientOne} />
       <div className={styles.ambientTwo} />
       <div className={styles.noise} />
@@ -364,7 +364,6 @@ export default function ImagesPage() {
 
               <div className={styles.tileOverlay}>
                 <div className={styles.tileText}>
-                  <h2 className={styles.tileTitle}>{fileName}</h2>
                   <p className={styles.tileMeta}>
                     {formatSize(item.size)} / {formatDate(item.uploadedAt)}
                   </p>
