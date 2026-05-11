@@ -22,24 +22,18 @@ interface BlogListClientProps {
 export default function BlogListClient({ posts, currentPage, totalPages, folders = [], activeFolder }: BlogListClientProps) {
   const prefersReducedMotion = useReducedMotion();
   const router = useRouter();
-  const [reads, setReads] = useState<Record<string, number>>({});
+  const [reads, setReads] = useState<Record<string, number>>(() => {
+    if (statsCache && Date.now() - statsCache.updatedAt < STATS_CACHE_TTL_MS) {
+      return statsCache.perPost;
+    }
+    return {};
+  });
 
   useEffect(() => {
     let mounted = true;
 
-    const hasFreshCache =
-      statsCache && Date.now() - statsCache.updatedAt < STATS_CACHE_TTL_MS;
-
-    if (hasFreshCache) {
-      setReads(statsCache!.perPost);
-    }
-
     async function fetchStats() {
       try {
-        if (!hasFreshCache && statsCache && Date.now() - statsCache.updatedAt < STATS_CACHE_TTL_MS) {
-          if (mounted) setReads(statsCache.perPost);
-          return;
-        }
         const res = await fetch('/api/stats');
         if (!res.ok) return;
         const data = (await res.json()) as { perPost?: Record<string, number> };
@@ -51,6 +45,7 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
         console.error(error);
       }
     }
+
     fetchStats();
     const id = setInterval(fetchStats, 30_000);
     return () => {

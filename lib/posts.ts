@@ -1,3 +1,7 @@
+import path from 'path';
+import fs from 'fs';
+import matter from 'gray-matter';
+
 export type PostMeta = {
   title: string;
   date?: string;
@@ -35,21 +39,17 @@ function normalizeSlugInput(slug: SlugInput): string {
 }
 
 function getPostFolder(filePath: string, postsDir: string): string | undefined {
-  const path = require('path');
   const relativeFolder = path.relative(postsDir, path.dirname(filePath));
   return relativeFolder && relativeFolder !== '.' ? relativeFolder.replace(/\\/g, '/') : undefined;
 }
 
 function getPostSlug(filePath: string, postsDir: string): string {
-  const path = require('path');
   const fileName = path.basename(filePath, '.md');
   const folder = getPostFolder(filePath, postsDir);
   return folder ? `${folder}/${fileName}` : fileName;
 }
 
 function readPostFile(filePath: string, postsDir: string): Post {
-  const fs = require('fs');
-  const matter = require('gray-matter');
   const file = fs.readFileSync(filePath, 'utf8');
   const { data, content } = matter(file);
 
@@ -60,6 +60,7 @@ function readPostFile(filePath: string, postsDir: string): Post {
   }
 
   const folder = getPostFolder(filePath, postsDir);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { category: _ignoredCategory, ...postData } = data as PostMeta & { category?: string };
 
   return {
@@ -75,9 +76,6 @@ function readPostFile(filePath: string, postsDir: string): Post {
 
 // Read markdown files from posts root and one-level subfolders only.
 function readPostsOneLevel(postsDir: string): Post[] {
-  const fs = require('fs');
-  const path = require('path');
-
   const posts: Post[] = [];
   const entries = fs.readdirSync(postsDir, { withFileTypes: true });
 
@@ -104,9 +102,6 @@ function readPostsOneLevel(postsDir: string): Post[] {
 
 // Find a post file by slug from posts root and one-level subfolders.
 function findPostFile(postsDir: string, targetSlug: string): string | null {
-  const fs = require('fs');
-  const path = require('path');
-
   try {
     const entries = fs.readdirSync(postsDir, { withFileTypes: true });
     for (const entry of entries) {
@@ -128,7 +123,7 @@ function findPostFile(postsDir: string, targetSlug: string): string | null {
         }
       }
     }
-  } catch (e) {
+  } catch {
     // ignore
   }
   return null;

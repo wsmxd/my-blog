@@ -645,10 +645,6 @@
 }
 
 @media (max-width: 860px) {
-  .page {
-    /* Margin removed because page is fixed now */
-  }
-
   .hero {
     margin-top: 0.5rem;
     align-items: stretch;

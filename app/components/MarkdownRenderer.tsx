@@ -1,12 +1,9 @@
-import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import CustomImg from "./CustomImg";
-
-const rehypeHighlightPlugin = rehypeHighlight as any;
 
 export default function MarkdownRenderer({ content }: { content: string }) {
   return (
@@ -30,7 +27,7 @@ export default function MarkdownRenderer({ content }: { content: string }) {
               },
             },
           ],
-          rehypeHighlightPlugin,
+          rehypeHighlight,
         ]}
         components={{
           img({ src, alt }: { src?: string; alt?: string; width?: string | number; height?: string | number }) {
