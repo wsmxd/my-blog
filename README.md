@@ -88,6 +88,17 @@ Set worker secret:
 npx --yes wrangler secret put UPLOAD_TOKEN --config worker/wrangler.toml
 ```
 
+### Quick worker setup
+
+If you want to use your own worker preferences instead of the repository defaults, run:
+
+```bash
+pnpm --dir worker setup
+```
+
+This writes `worker/wrangler.local.toml` and, if you provide one, `worker/.dev.vars`.
+After that, the regular worker scripts will automatically prefer the local config file.
+
 ### Worker commands
 
 ```bash

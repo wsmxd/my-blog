@@ -53,3 +53,5 @@ next-env.d.ts
 worker/.wrangler/
 worker/.dev.vars
 worker/.env
+worker/wrangler.local.toml
+worker/worker-configuration.d.ts
