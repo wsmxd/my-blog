@@ -25,6 +25,7 @@ const imageMimeTypes = new Set([
 ]);
 
 const IMAGE_PATH_PREFIX = 'images';
+const POST_IMAGE_PATH_PREFIX = 'posts';
 
 function json(data: unknown, status = 200, headers?: HeadersInit): Response {
   return new Response(JSON.stringify(data), {
@@ -101,7 +102,12 @@ function requireBearer(request: Request, env: Env): boolean {
 }
 
 function isUploadPath(pathname: string): boolean {
-  return pathname === '/upload' || pathname.endsWith('/upload') || pathname === '/image-upload' || pathname.endsWith('/image-upload');
+  return pathname === '/upload'
+    || pathname.endsWith('/upload')
+    || pathname === '/image-upload'
+    || pathname.endsWith('/image-upload')
+    || pathname === '/post-upload'
+    || pathname.endsWith('/post-upload');
 }
 
 function toStoredObject(env: Env, key: string, size: number, uploadedAt: Date, etag: string) {
@@ -124,15 +130,18 @@ const worker = {
     }
 
     const isImageUploadPath = url.pathname === '/image-upload' || url.pathname.endsWith('/image-upload');
+    const isPostImageUploadPath = url.pathname === '/post-upload' || url.pathname.endsWith('/post-upload');
     const isImageListPath = url.pathname === '/images' || url.pathname.endsWith('/images');
+    const isPostImageListPath = url.pathname === '/post-images' || url.pathname.endsWith('/post-images');
     const isImageDeletePath = url.pathname === '/image-delete' || url.pathname.endsWith('/image-delete');
     const isVideoUploadPath = !isImageUploadPath && (url.pathname === '/upload' || url.pathname.endsWith('/upload'));
     const publicImageKey = url.pathname.match(/(?:^|\/)(images\/.+)$/)?.[1];
+    const publicPostImageKey = url.pathname.match(/(?:^|\/)(posts\/.+)$/)?.[1];
     const publicVideoKey = url.pathname.match(/(?:^|\/)(videos\/.+)$/)?.[1];
 
-    if ((request.method === 'GET' || request.method === 'HEAD') && (publicImageKey || publicVideoKey)) {
-      const key = publicImageKey || publicVideoKey || '';
-      const object = publicImageKey
+    if ((request.method === 'GET' || request.method === 'HEAD') && (publicImageKey || publicPostImageKey || publicVideoKey)) {
+      const key = publicImageKey || publicPostImageKey || publicVideoKey || '';
+      const object = publicImageKey || publicPostImageKey
         ? await env.IMAGE_BUCKET.get(key)
         : await env.VIDEO_BUCKET.get(key);
 
@@ -148,13 +157,14 @@ const worker = {
       return new Response(request.method === 'HEAD' ? null : object.body, { headers });
     }
 
-    if (isImageListPath && request.method === 'GET') {
+    if ((isImageListPath || isPostImageListPath) && request.method === 'GET') {
       const limitParam = Number(url.searchParams.get('limit') || '60');
       const limit = Number.isFinite(limitParam) ? Math.min(Math.max(Math.trunc(limitParam), 1), 100) : 60;
       const cursor = url.searchParams.get('cursor') || undefined;
+      const prefix = isPostImageListPath ? `${POST_IMAGE_PATH_PREFIX}/` : `${IMAGE_PATH_PREFIX}/`;
 
       const result = await env.IMAGE_BUCKET.list({
-        prefix: `${IMAGE_PATH_PREFIX}/`,
+        prefix,
         limit,
         cursor,
       });
@@ -244,9 +254,11 @@ const worker = {
 
     const key = isImageUploadPath
       ? buildMediaKey(IMAGE_PATH_PREFIX, filename)
+      : isPostImageUploadPath
+        ? buildMediaKey(POST_IMAGE_PATH_PREFIX, filename)
       : buildMediaKey('videos', filename);
 
-    const bucket = isImageUploadPath ? env.IMAGE_BUCKET : env.VIDEO_BUCKET;
+    const bucket = isImageUploadPath || isPostImageUploadPath ? env.IMAGE_BUCKET : env.VIDEO_BUCKET;
     await bucket.put(key, bytes, {
       httpMetadata: { contentType },
     });
@@ -255,8 +267,8 @@ const worker = {
       {
         key,
         pathname: key,
-        url: buildPublicUrl(env, key, isImageUploadPath ? 'image' : 'video'),
-        downloadUrl: buildPublicUrl(env, key, isImageUploadPath ? 'image' : 'video'),
+        url: buildPublicUrl(env, key, isVideoUploadPath ? 'video' : 'image'),
+        downloadUrl: buildPublicUrl(env, key, isVideoUploadPath ? 'video' : 'image'),
         contentType,
         size: bytes.byteLength,
       },

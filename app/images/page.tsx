@@ -360,7 +360,7 @@ export default function ImagesPage() {
             />
           </label>
 
-          <Link href="/upload" className={styles.primaryButton}>
+          <Link href="/upload/image" className={styles.primaryButton}>
             上传
           </Link>
         </div>
@@ -439,7 +439,7 @@ export default function ImagesPage() {
       {!isLoading && !error && items.length === 0 ? (
         <section className={styles.emptyState}>
           <h2>图床为空</h2>
-          <Link href="/upload">上传图片</Link>
+          <Link href="/upload/image">上传图片</Link>
         </section>
       ) : null}
 

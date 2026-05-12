@@ -1,446 +1,84 @@
-'use client';
-
-import type { PutBlobResult } from '@vercel/blob';
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState } from 'react';
 
-const MAX_FILES = 10;
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
+type UploadRouteCard = {
+  href: string;
+  title: string;
+  description: string;
+  accent: string;
+};
 
-function buildAuthHeaders(tokenValue: string): HeadersInit {
-  const value = tokenValue.trim();
-  return value ? { Authorization: `Bearer ${value}` } : {};
-}
+const uploadRoutes: UploadRouteCard[] = [
+  {
+    href: '/upload/image',
+    title: '图床图片上传',
+    description: '上传到图片库，适合封面、截图和公共图片资源。',
+    accent: 'from-sky-500/30 via-cyan-400/15 to-transparent',
+  },
+  {
+    href: '/upload/post',
+    title: '文章配图入口',
+    description: '给文章内容里的内嵌图片预留独立路由，避免混进图床。',
+    accent: 'from-fuchsia-500/30 via-pink-400/15 to-transparent',
+  },
+  {
+    href: '/upload/video',
+    title: '视频上传',
+    description: '保持与图片分离的视频上传入口。',
+    accent: 'from-emerald-500/30 via-teal-400/15 to-transparent',
+  },
+];
 
-function getFileKey(file: File): string {
-  return `${file.name}:${file.size}:${file.lastModified}`;
-}
-
-function isAcceptedImageFile(file: File): boolean {
-  return ACCEPTED_IMAGE_TYPES.includes(file.type);
-}
-
-export default function AvatarUploadPage() {
-  const inputFileRef = useRef<HTMLInputElement>(null);
-  const [blobs, setBlobs] = useState<PutBlobResult[]>([]);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [token, setToken] = useState<string>('');
-  const [isDragOver, setIsDragOver] = useState(false);
-
-  const helpText = useMemo(
-    () =>
-      error
-        ? error
-        : 'JPG / PNG / WEBP / GIF / AVIF · 最大 10MB（浏览器限制）',
-    [error],
-  );
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem('uploadToken');
-    if (savedToken) {
-      setToken(savedToken);
-    }
-  }, []);
-
-  const syncHiddenInputFiles = (nextFiles: File[]) => {
-    if (!inputFileRef.current) {
-      return;
-    }
-
-    const dataTransfer = new DataTransfer();
-    nextFiles.forEach((file) => dataTransfer.items.add(file));
-    inputFileRef.current.files = dataTransfer.files;
-  };
-
-  const mergeFiles = (currentFiles: File[], incomingFiles: File[]) => {
-    const currentKeys = new Set(currentFiles.map(getFileKey));
-    const uniqueIncoming = incomingFiles.filter((file) => !currentKeys.has(getFileKey(file)));
-
-    if (uniqueIncoming.length === 0) {
-      return currentFiles;
-    }
-
-    if (currentFiles.length + uniqueIncoming.length > MAX_FILES) {
-      setError(`一次最多上传 ${MAX_FILES} 张图片`);
-      return currentFiles;
-    }
-
-    return [...currentFiles, ...uniqueIncoming];
-  };
-
-  const acceptIncomingFiles = (incomingFiles: File[]) => {
-    const nextFiles = mergeFiles(selectedFiles, incomingFiles);
-    if (nextFiles === selectedFiles) {
-      syncHiddenInputFiles(selectedFiles);
-      return;
-    }
-
-    setError(null);
-    setSelectedFiles(nextFiles);
-    syncHiddenInputFiles(nextFiles);
-  };
-
-  const handleFileChange = () => {
-    const fileList = inputFileRef.current?.files;
-    if (!fileList || fileList.length === 0) {
-      return;
-    }
-
-    const files = Array.from(fileList).filter(isAcceptedImageFile);
-    if (files.length === 0) {
-      setError('请选择 JPG / PNG / WEBP / GIF / AVIF 格式的图片');
-      return;
-    }
-
-    acceptIncomingFiles(files);
-  };
-
-  const resetState = () => {
-    setError(null);
-    setBlobs([]);
-    setSelectedFiles([]);
-    if (inputFileRef.current) {
-      inputFileRef.current.value = '';
-      inputFileRef.current.files = null;
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragOver(false);
-
-    const files = Array.from(e.dataTransfer.files).filter(isAcceptedImageFile);
-
-    if (files.length === 0) {
-      setError('请拖入 JPG / PNG / WEBP / GIF / AVIF 格式的图片');
-      return;
-    }
-
-    acceptIncomingFiles(files);
-  };
-
+export default function UploadHubPage() {
   return (
-    <main style={styles.page}>
-      <section style={styles.card}>
-        <header style={styles.header}>
-          <div>
-            <p style={styles.kicker}>Image Bed</p>
-            <h1 style={styles.title}>上传图片</h1>
-            <p style={styles.subtitle}>支持 JPG / PNG / WEBP / GIF / AVIF，上传后可在图床中查看和管理。</p>
-          </div>
-        </header>
+    <main
+      className="min-h-screen px-4 py-12 sm:px-6 lg:px-8"
+      style={{
+        backgroundColor: 'var(--background)',
+        color: 'var(--foreground)',
+        backgroundImage:
+          'radial-gradient(circle at 20% 20%, var(--hero-glow-a) 0%, transparent 32%), radial-gradient(circle at 80% 0%, var(--hero-glow-b) 0%, transparent 28%)',
+      }}
+    >
+      <section className="mx-auto flex w-full max-w-5xl flex-col gap-8 rounded-[32px] border border-[color:var(--card-border)] bg-[var(--card-bg)] p-6 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur md:p-8 dark:shadow-[0_24px_80px_rgba(0,0,0,0.36)]">
+        <div className="max-w-2xl space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--filter-active-from)]">Upload Routes</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-[var(--foreground)] sm:text-4xl">把不同类型的上传分开</h1>
+          <p className="text-sm leading-7 text-[var(--muted-foreground)] sm:text-base">
+            这里是统一入口，不同内容会进入不同路由。图床图片、文章配图和视频各自独立，避免文章内嵌图片和图床资源混在同一个页面里。
+          </p>
+        </div>
 
-        <form
-          style={styles.form}
-          onSubmit={async (event) => {
-            event.preventDefault();
-            setError(null);
-            setBlobs([]);
-
-            if (selectedFiles.length === 0) {
-              setError('请先选择图片');
-              return;
-            }
-
-            if (!token.trim()) {
-              setError('请输入访问令牌');
-              return;
-            }
-
-            setIsUploading(true);
-            try {
-              if (token.trim()) {
-                localStorage.setItem('uploadToken', token.trim());
-              }
-
-              const uploads = selectedFiles.map(async (file) => {
-                const response = await fetch(
-                  `/api/avatar/upload?filename=${encodeURIComponent(file.name)}`,
-                  {
-                    method: 'POST',
-                    body: file,
-                    headers: buildAuthHeaders(token),
-                  },
-                );
-
-                if (!response.ok) {
-                  throw new Error(`上传失败：${file.name}`);
-                }
-
-                return (await response.json()) as PutBlobResult;
-              });
-
-              const results = await Promise.all(uploads);
-              setBlobs(results);
-            } catch (err) {
-              setError(err instanceof Error ? err.message : '上传出现问题');
-            } finally {
-              setIsUploading(false);
-            }
-          }}
-        >
-          <label style={styles.inputLabel}>
-            <span style={styles.labelText}>访问令牌 (Token)</span>
-            <input
-              type="password"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder="请输入访问令牌"
-              style={styles.tokenInput}
-              required
-            />
-          </label>
-
-          <label
-            style={{
-              ...styles.dropzone,
-              ...(isDragOver
-                ? { borderColor: 'rgba(96,165,250,0.7)', background: 'rgba(96,165,250,0.08)' }
-                : {}),
-            }}
-            onDragOver={handleDragOver}
-            onDragEnter={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <input
-              name="file"
-              ref={inputFileRef}
-              type="file"
-              multiple
-              accept="image/jpeg, image/png, image/webp, image/gif, image/avif"
-              onChange={handleFileChange}
-              required
-              style={styles.hiddenInput}
-            />
-            <div style={styles.dropzoneInner}>
-              <span style={styles.dropzoneIcon}>⬆</span>
-              <p style={styles.dropzoneText}>点击选择图片，或将文件拖入此处（最多 10 张）</p>
-              {selectedFiles.length > 0 && (
-                <p style={styles.fileName}>
-                  {selectedFiles.length} 个文件：{selectedFiles.map((file) => file.name).join(', ')}
-                </p>
-              )}
-            </div>
-          </label>
-
-          <div style={styles.actions}>
-            <small style={{ ...styles.help, color: error ? '#fca5a5' : '#9ca3af' }}>{helpText}</small>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                style={{ ...styles.button, background: 'rgba(148,163,184,0.15)', color: '#cbd5e1' }}
-                type="button"
-                onClick={resetState}
-                disabled={isUploading}
-              >
-                清空
-              </button>
-              <button style={styles.button} type="submit" disabled={isUploading}>
-                {isUploading ? '上传中...' : '开始上传'}
-              </button>
-            </div>
-          </div>
-        </form>
-
-        {blobs.length > 0 && (
-          <div style={styles.resultBox}>
-            <p style={styles.resultLabel}>上传成功，访问链接：</p>
-            <ul style={styles.resultList}>
-              {blobs.map((item) => (
-                <li key={item.url} style={styles.resultItem}>
-                  <a style={styles.resultLink} href={item.url} target="_blank" rel="noreferrer">
-                    {item.url}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <Link href="/images" style={styles.galleryLink}>
-              去图床查看和管理
+        <div className="grid gap-4 md:grid-cols-3">
+          {uploadRoutes.map((route) => (
+            <Link
+              key={route.href}
+              href={route.href}
+              className="group relative overflow-hidden rounded-3xl border border-[color:var(--card-border)] bg-[var(--surface-soft)] p-5 transition-transform duration-300 hover:-translate-y-1 hover:border-[color:var(--filter-active-shadow)]"
+            >
+              <span className={`absolute inset-0 bg-gradient-to-br ${route.accent} opacity-70 transition-opacity duration-300 group-hover:opacity-100`} />
+              <span className="absolute inset-px rounded-[22px] bg-[var(--surface-strong)]" />
+              <div className="relative z-10 flex h-full flex-col gap-3">
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--muted-foreground)]">Route</p>
+                  <h2 className="text-xl font-semibold text-[var(--foreground)]">{route.title}</h2>
+                </div>
+                <p className="text-sm leading-6 text-[var(--muted-foreground)]">{route.description}</p>
+                <div className="mt-auto pt-4 text-sm font-semibold text-[var(--filter-active-from)] transition-colors group-hover:text-[var(--filter-active-to)]">
+                  打开 {route.href}
+                </div>
+              </div>
             </Link>
-          </div>
-        )}
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--muted-foreground)]">
+          <Link href="/images" className="font-semibold text-[var(--filter-active-from)] transition-colors hover:text-[var(--filter-active-to)]">
+            去图床管理
+          </Link>
+          <span className="hidden h-4 w-px bg-[var(--card-border)] sm:block" />
+          <span>如果你只是要上传封面或公共图片，优先进入图床图片上传。</span>
+        </div>
       </section>
     </main>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '48px 16px',
-    background:
-      'radial-gradient(circle at 20% 20%, rgba(59,130,246,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(236,72,153,0.12), transparent 30%), #0b1221',
-  },
-  card: {
-    width: '100%',
-    maxWidth: 720,
-    background: 'linear-gradient(145deg, #0f172a 0%, #0b1221 100%)',
-    borderRadius: 20,
-    boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
-    padding: '32px 32px 28px',
-    border: '1px solid rgba(255,255,255,0.05)',
-  },
-  header: {
-    marginBottom: 24,
-  },
-  kicker: {
-    textTransform: 'uppercase',
-    letterSpacing: 2,
-    fontSize: 12,
-    fontWeight: 700,
-    color: '#93c5fd',
-    marginBottom: 6,
-  },
-  title: {
-    fontSize: 26,
-    margin: '0 0 6px',
-    color: '#e5e7eb',
-  },
-  subtitle: {
-    margin: 0,
-    color: '#94a3b8',
-    fontSize: 14,
-  },
-  form: {
-    display: 'grid',
-    gap: 16,
-  },
-  dropzone: {
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderColor: 'rgba(148,163,184,0.35)',
-    borderRadius: 16,
-    padding: 16,
-    background: 'rgba(148,163,184,0.05)',
-    cursor: 'pointer',
-    transition: 'border-color 0.2s ease, background 0.2s ease',
-    display: 'block',
-  },
-  dropzoneInner: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    color: '#cbd5e1',
-    padding: '24px 12px',
-  },
-  dropzoneIcon: {
-    fontSize: 28,
-  },
-  dropzoneText: {
-    margin: 0,
-    fontSize: 14,
-  },
-  fileName: {
-    margin: 0,
-    fontSize: 13,
-    color: '#a5b4fc',
-  },
-  hiddenInput: {
-    position: 'absolute',
-    width: 1,
-    height: 1,
-    padding: 0,
-    margin: -1,
-    overflow: 'hidden',
-    clip: 'rect(0,0,0,0)',
-    border: 0,
-  },
-  actions: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    flexWrap: 'wrap',
-  },
-  help: {
-    fontSize: 12,
-    margin: 0,
-  },
-  button: {
-    border: 'none',
-    background: 'linear-gradient(135deg, #3b82f6, #a855f7)',
-    color: '#f8fafc',
-    fontWeight: 600,
-    padding: '10px 18px',
-    borderRadius: 10,
-    cursor: 'pointer',
-    minWidth: 120,
-    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-  },
-  resultBox: {
-    marginTop: 8,
-    padding: '12px 14px',
-    borderRadius: 12,
-    background: 'rgba(148,163,184,0.08)',
-    border: '1px solid rgba(148,163,184,0.25)',
-  },
-  resultLabel: {
-    margin: '0 0 4px',
-    fontSize: 13,
-    color: '#cbd5e1',
-  },
-  resultLink: {
-    wordBreak: 'break-all',
-    color: '#93c5fd',
-    fontWeight: 600,
-    textDecoration: 'none',
-  },
-  resultList: {
-    margin: 0,
-    paddingLeft: 18,
-    display: 'grid',
-    gap: 6,
-  },
-  resultItem: {
-    color: '#e5e7eb',
-  },
-  galleryLink: {
-    display: 'inline-flex',
-    width: 'fit-content',
-    marginTop: 12,
-    color: '#bfdbfe',
-    fontSize: 13,
-    fontWeight: 700,
-    textDecoration: 'none',
-  },
-  inputLabel: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 6,
-  },
-  labelText: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#cbd5e1',
-    letterSpacing: 0.3,
-  },
-  tokenInput: {
-    padding: '10px 14px',
-    borderRadius: 10,
-    border: '1px solid rgba(148,163,184,0.35)',
-    background: 'rgba(148,163,184,0.05)',
-    color: '#e5e7eb',
-    fontSize: 14,
-    outline: 'none',
-    transition: 'border-color 0.2s ease, background 0.2s ease',
-  },
-};

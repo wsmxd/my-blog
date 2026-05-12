@@ -1,0 +1,450 @@
+'use client';
+
+import type { PutBlobResult } from '@vercel/blob';
+import Link from 'next/link';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+const MAX_FILES = 10;
+const IMAGE_UPLOAD_TOKEN_KEY = 'imageUploadToken';
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
+
+function buildAuthHeaders(tokenValue: string): HeadersInit {
+  const value = tokenValue.trim();
+  return value ? { Authorization: `Bearer ${value}` } : {};
+}
+
+function getFileKey(file: File): string {
+  return `${file.name}:${file.size}:${file.lastModified}`;
+}
+
+function isAcceptedImageFile(file: File): boolean {
+  return ACCEPTED_IMAGE_TYPES.includes(file.type);
+}
+
+export default function ImageUploadPage() {
+  const inputFileRef = useRef<HTMLInputElement>(null);
+  const [blobs, setBlobs] = useState<PutBlobResult[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [token, setToken] = useState<string>('');
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const helpText = useMemo(
+    () =>
+      error
+        ? error
+        : 'JPG / PNG / WEBP / GIF / AVIF · 单次最多 10 张',
+    [error],
+  );
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem(IMAGE_UPLOAD_TOKEN_KEY);
+    if (savedToken) {
+      setToken(savedToken);
+    }
+  }, []);
+
+  const syncHiddenInputFiles = (nextFiles: File[]) => {
+    if (!inputFileRef.current) {
+      return;
+    }
+
+    const dataTransfer = new DataTransfer();
+    nextFiles.forEach((file) => dataTransfer.items.add(file));
+    inputFileRef.current.files = dataTransfer.files;
+  };
+
+  const mergeFiles = (currentFiles: File[], incomingFiles: File[]) => {
+    const currentKeys = new Set(currentFiles.map(getFileKey));
+    const uniqueIncoming = incomingFiles.filter((file) => !currentKeys.has(getFileKey(file)));
+
+    if (uniqueIncoming.length === 0) {
+      return currentFiles;
+    }
+
+    if (currentFiles.length + uniqueIncoming.length > MAX_FILES) {
+      setError(`一次最多上传 ${MAX_FILES} 张图片`);
+      return currentFiles;
+    }
+
+    return [...currentFiles, ...uniqueIncoming];
+  };
+
+  const acceptIncomingFiles = (incomingFiles: File[]) => {
+    const nextFiles = mergeFiles(selectedFiles, incomingFiles);
+    if (nextFiles === selectedFiles) {
+      syncHiddenInputFiles(selectedFiles);
+      return;
+    }
+
+    setError(null);
+    setSelectedFiles(nextFiles);
+    syncHiddenInputFiles(nextFiles);
+  };
+
+  const handleFileChange = () => {
+    const fileList = inputFileRef.current?.files;
+    if (!fileList || fileList.length === 0) {
+      return;
+    }
+
+    const files = Array.from(fileList).filter(isAcceptedImageFile);
+    if (files.length === 0) {
+      setError('请选择 JPG / PNG / WEBP / GIF / AVIF 格式的图片');
+      return;
+    }
+
+    acceptIncomingFiles(files);
+  };
+
+  const resetState = () => {
+    setError(null);
+    setBlobs([]);
+    setSelectedFiles([]);
+    if (inputFileRef.current) {
+      inputFileRef.current.value = '';
+      inputFileRef.current.files = null;
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const files = Array.from(e.dataTransfer.files).filter(isAcceptedImageFile);
+
+    if (files.length === 0) {
+      setError('请拖入 JPG / PNG / WEBP / GIF / AVIF 格式的图片');
+      return;
+    }
+
+    acceptIncomingFiles(files);
+  };
+
+  return (
+    <main style={styles.page}>
+      <section style={styles.card}>
+        <header style={styles.header}>
+          <div>
+            <p style={styles.kicker}>图床上传</p>
+            <h1 style={styles.title}>上传图片</h1>
+            <p style={styles.subtitle}>这是图床专用入口，文章内嵌图片请走独立的文章素材路由。</p>
+          </div>
+        </header>
+
+        <form
+          style={styles.form}
+          onSubmit={async (event) => {
+            event.preventDefault();
+            setError(null);
+            setBlobs([]);
+
+            if (selectedFiles.length === 0) {
+              setError('请先选择图片');
+              return;
+            }
+
+            if (!token.trim()) {
+              setError('请输入访问令牌');
+              return;
+            }
+
+            setIsUploading(true);
+            try {
+              localStorage.setItem(IMAGE_UPLOAD_TOKEN_KEY, token.trim());
+
+              const uploads = selectedFiles.map(async (file) => {
+                const response = await fetch(
+                  `/api/avatar/upload?filename=${encodeURIComponent(file.name)}`,
+                  {
+                    method: 'POST',
+                    body: file,
+                    headers: buildAuthHeaders(token),
+                  },
+                );
+
+                if (!response.ok) {
+                  throw new Error(`上传失败：${file.name}`);
+                }
+
+                return (await response.json()) as PutBlobResult;
+              });
+
+              const results = await Promise.all(uploads);
+              setBlobs(results);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : '上传出现问题');
+            } finally {
+              setIsUploading(false);
+            }
+          }}
+        >
+          <label style={styles.inputLabel}>
+            <span style={styles.labelText}>图床访问令牌 (Token)</span>
+            <input
+              type="password"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="请输入访问令牌"
+              style={styles.tokenInput}
+              required
+            />
+          </label>
+
+          <label
+            style={{
+              ...styles.dropzone,
+              ...(isDragOver
+                ? { borderColor: 'rgba(96,165,250,0.7)', background: 'rgba(96,165,250,0.08)' }
+                : {}),
+            }}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <input
+              name="file"
+              ref={inputFileRef}
+              type="file"
+              multiple
+              accept="image/jpeg, image/png, image/webp, image/gif, image/avif"
+              onChange={handleFileChange}
+              required
+              style={styles.hiddenInput}
+            />
+            <div style={styles.dropzoneInner}>
+              <span style={styles.dropzoneIcon}>⬆</span>
+              <p style={styles.dropzoneText}>点击选择图片，或将文件拖入此处（最多 10 张）</p>
+              {selectedFiles.length > 0 && (
+                <p style={styles.fileName}>
+                  {selectedFiles.length} 个文件：{selectedFiles.map((file) => file.name).join(', ')}
+                </p>
+              )}
+            </div>
+          </label>
+
+          <div style={styles.actions}>
+            <small style={{ ...styles.help, color: error ? '#fca5a5' : '#9ca3af' }}>{helpText}</small>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                style={{ ...styles.button, background: 'rgba(148,163,184,0.15)', color: '#cbd5e1' }}
+                type="button"
+                onClick={resetState}
+                disabled={isUploading}
+              >
+                清空
+              </button>
+              <button style={styles.button} type="submit" disabled={isUploading}>
+                {isUploading ? '上传中...' : '开始上传'}
+              </button>
+            </div>
+          </div>
+        </form>
+
+        {blobs.length > 0 && (
+          <div style={styles.resultBox}>
+            <p style={styles.resultLabel}>上传成功，访问链接：</p>
+            <ul style={styles.resultList}>
+              {blobs.map((item) => (
+                <li key={item.url} style={styles.resultItem}>
+                  <a style={styles.resultLink} href={item.url} target="_blank" rel="noreferrer">
+                    {item.url}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <Link href="/images" style={styles.galleryLink}>
+              去图床查看和管理
+            </Link>
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  page: {
+    minHeight: '100vh',
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '48px 16px',
+    backgroundColor: 'var(--background)',
+    backgroundImage:
+      'radial-gradient(circle at 20% 20%, var(--hero-glow-a) 0%, transparent 35%), radial-gradient(circle at 80% 0%, var(--hero-glow-b) 0%, transparent 30%)',
+    color: 'var(--foreground)',
+  },
+  card: {
+    width: '100%',
+    maxWidth: 720,
+    background: 'var(--card-bg)',
+    borderRadius: 20,
+    boxShadow: '0 24px 60px rgba(15,23,42,0.12)',
+    padding: '32px 32px 28px',
+    border: '1px solid var(--card-border)',
+    backdropFilter: 'blur(10px)',
+  },
+  header: {
+    marginBottom: 24,
+  },
+  kicker: {
+    textTransform: 'uppercase',
+    letterSpacing: 2,
+    fontSize: 12,
+    fontWeight: 700,
+    color: 'var(--filter-active-from)',
+    marginBottom: 6,
+  },
+  title: {
+    fontSize: 26,
+    margin: '0 0 6px',
+    color: 'var(--foreground)',
+  },
+  subtitle: {
+    margin: 0,
+    color: 'var(--muted-foreground)',
+    fontSize: 14,
+  },
+  form: {
+    display: 'grid',
+    gap: 16,
+  },
+  dropzone: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: 'var(--card-border)',
+    borderRadius: 16,
+    padding: 16,
+    background: 'var(--surface-soft)',
+    cursor: 'pointer',
+    transition: 'border-color 0.2s ease, background 0.2s ease',
+    display: 'block',
+  },
+  dropzoneInner: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    color: 'var(--foreground)',
+    padding: '24px 12px',
+  },
+  dropzoneIcon: {
+    fontSize: 28,
+  },
+  dropzoneText: {
+    margin: 0,
+    fontSize: 14,
+    color: 'var(--muted-foreground)',
+  },
+  fileName: {
+    margin: 0,
+    fontSize: 13,
+    color: 'var(--filter-active-from)',
+  },
+  hiddenInput: {
+    position: 'absolute',
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: 'hidden',
+    clip: 'rect(0,0,0,0)',
+    border: 0,
+  },
+  actions: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    flexWrap: 'wrap',
+  },
+  help: {
+    fontSize: 12,
+    margin: 0,
+    color: 'var(--muted-foreground)',
+  },
+  button: {
+    border: 'none',
+    background: 'linear-gradient(135deg, #3b82f6, #a855f7)',
+    color: '#f8fafc',
+    fontWeight: 600,
+    padding: '10px 18px',
+    borderRadius: 10,
+    cursor: 'pointer',
+    minWidth: 120,
+    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+  },
+  resultBox: {
+    marginTop: 8,
+    padding: '12px 14px',
+    borderRadius: 12,
+    background: 'var(--surface-soft)',
+    border: '1px solid var(--card-border)',
+  },
+  resultLabel: {
+    margin: '0 0 4px',
+    fontSize: 13,
+    color: 'var(--foreground)',
+  },
+  resultLink: {
+    wordBreak: 'break-all',
+    color: 'var(--filter-active-from)',
+    fontWeight: 600,
+    textDecoration: 'none',
+  },
+  resultList: {
+    margin: 0,
+    paddingLeft: 18,
+    display: 'grid',
+    gap: 6,
+  },
+  resultItem: {
+    color: 'var(--foreground)',
+  },
+  galleryLink: {
+    display: 'inline-flex',
+    width: 'fit-content',
+    marginTop: 12,
+    color: 'var(--filter-active-from)',
+    fontSize: 13,
+    fontWeight: 700,
+    textDecoration: 'none',
+  },
+  inputLabel: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
+  },
+  labelText: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: 'var(--foreground)',
+    letterSpacing: 0.3,
+  },
+  tokenInput: {
+    padding: '10px 14px',
+    borderRadius: 10,
+    border: '1px solid var(--card-border)',
+    background: 'var(--surface-soft)',
+    color: 'var(--foreground)',
+    fontSize: 14,
+    outline: 'none',
+    transition: 'border-color 0.2s ease, background 0.2s ease',
+  },
+};

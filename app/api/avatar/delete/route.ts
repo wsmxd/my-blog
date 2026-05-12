@@ -23,7 +23,7 @@ function getWorkerImageDeleteUrl(pathname: string): string | null {
 }
 
 function inferSource(pathname: string): DeleteSource {
-  if (pathname.startsWith('images/')) {
+  if (pathname.startsWith('images/') || pathname.startsWith('posts/')) {
     return 'cloudflare';
   }
 
