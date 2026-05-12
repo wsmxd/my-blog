@@ -6,6 +6,8 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import CustomImg from "./CustomImg";
 
 export default function MarkdownRenderer({ content }: { content: string }) {
+  let imageIndex = 0;
+
   return (
     // prose prose-slate dark:prose-invert这些样式会导致在浏览器中内容显示被限制在了一定的宽度，而导致右边有很多空白
     <article className="markdown-body max-w-none">
@@ -31,7 +33,10 @@ export default function MarkdownRenderer({ content }: { content: string }) {
         ]}
         components={{
           img({ src, alt }: { src?: string; alt?: string; width?: string | number; height?: string | number }) {
-            return <CustomImg src={src} alt={alt} />;
+            const isFirstImage = imageIndex === 0;
+            imageIndex += 1;
+
+            return <CustomImg src={src} alt={alt} loading={isFirstImage ? 'eager' : 'lazy'} />;
           },
         }}
       >

@@ -5,16 +5,25 @@ import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 const MAX_FILES = 10;
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
 
 function buildAuthHeaders(tokenValue: string): HeadersInit {
   const value = tokenValue.trim();
   return value ? { Authorization: `Bearer ${value}` } : {};
 }
 
+function getFileKey(file: File): string {
+  return `${file.name}:${file.size}:${file.lastModified}`;
+}
+
+function isAcceptedImageFile(file: File): boolean {
+  return ACCEPTED_IMAGE_TYPES.includes(file.type);
+}
+
 export default function AvatarUploadPage() {
   const inputFileRef = useRef<HTMLInputElement>(null);
   const [blobs, setBlobs] = useState<PutBlobResult[]>([]);
-  const [fileNames, setFileNames] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [token, setToken] = useState<string>('');
@@ -28,7 +37,6 @@ export default function AvatarUploadPage() {
     [error],
   );
 
-  // 组件加载时从 localStorage 读取保存的 token
   useEffect(() => {
     const savedToken = localStorage.getItem('uploadToken');
     if (savedToken) {
@@ -36,29 +44,66 @@ export default function AvatarUploadPage() {
     }
   }, []);
 
-  const handleFileChange = () => {
-    const fileList = inputFileRef.current?.files;
-    if (!fileList || fileList.length === 0) {
-      setFileNames([]);
+  const syncHiddenInputFiles = (nextFiles: File[]) => {
+    if (!inputFileRef.current) {
       return;
     }
 
-    if (fileList.length > MAX_FILES) {
-      setError('一次最多选择 10 张图片');
-      setFileNames([]);
+    const dataTransfer = new DataTransfer();
+    nextFiles.forEach((file) => dataTransfer.items.add(file));
+    inputFileRef.current.files = dataTransfer.files;
+  };
+
+  const mergeFiles = (currentFiles: File[], incomingFiles: File[]) => {
+    const currentKeys = new Set(currentFiles.map(getFileKey));
+    const uniqueIncoming = incomingFiles.filter((file) => !currentKeys.has(getFileKey(file)));
+
+    if (uniqueIncoming.length === 0) {
+      return currentFiles;
+    }
+
+    if (currentFiles.length + uniqueIncoming.length > MAX_FILES) {
+      setError(`一次最多上传 ${MAX_FILES} 张图片`);
+      return currentFiles;
+    }
+
+    return [...currentFiles, ...uniqueIncoming];
+  };
+
+  const acceptIncomingFiles = (incomingFiles: File[]) => {
+    const nextFiles = mergeFiles(selectedFiles, incomingFiles);
+    if (nextFiles === selectedFiles) {
+      syncHiddenInputFiles(selectedFiles);
       return;
     }
 
     setError(null);
-    setFileNames(Array.from(fileList).map((f) => f.name));
+    setSelectedFiles(nextFiles);
+    syncHiddenInputFiles(nextFiles);
+  };
+
+  const handleFileChange = () => {
+    const fileList = inputFileRef.current?.files;
+    if (!fileList || fileList.length === 0) {
+      return;
+    }
+
+    const files = Array.from(fileList).filter(isAcceptedImageFile);
+    if (files.length === 0) {
+      setError('请选择 JPG / PNG / WEBP / GIF / AVIF 格式的图片');
+      return;
+    }
+
+    acceptIncomingFiles(files);
   };
 
   const resetState = () => {
     setError(null);
     setBlobs([]);
-    setFileNames([]);
+    setSelectedFiles([]);
     if (inputFileRef.current) {
       inputFileRef.current.value = '';
+      inputFileRef.current.files = null;
     }
   };
 
@@ -79,30 +124,16 @@ export default function AvatarUploadPage() {
     e.stopPropagation();
     setIsDragOver(false);
 
-    const files = Array.from(e.dataTransfer.files).filter((f) =>
-      ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'].includes(f.type),
-    );
+    const files = Array.from(e.dataTransfer.files).filter(isAcceptedImageFile);
 
     if (files.length === 0) {
       setError('请拖入 JPG / PNG / WEBP / GIF / AVIF 格式的图片');
       return;
     }
 
-    if (files.length > MAX_FILES) {
-      setError(`一次最多上传 ${MAX_FILES} 张图片`);
-      return;
-    }
-
-    setError(null);
-    setFileNames(files.map((f) => f.name));
-
-    // 将拖入的文件写入隐藏的 file input
-    const dataTransfer = new DataTransfer();
-    files.forEach((f) => dataTransfer.items.add(f));
-    if (inputFileRef.current) {
-      inputFileRef.current.files = dataTransfer.files;
-    }
+    acceptIncomingFiles(files);
   };
+
   return (
     <main style={styles.page}>
       <section style={styles.card}>
@@ -121,15 +152,8 @@ export default function AvatarUploadPage() {
             setError(null);
             setBlobs([]);
 
-            const fileList = inputFileRef.current?.files;
-
-            if (!fileList || fileList.length === 0) {
+            if (selectedFiles.length === 0) {
               setError('请先选择图片');
-              return;
-            }
-
-            if (fileList.length > 10) {
-              setError('每次最多上传 10 张图片');
               return;
             }
 
@@ -140,12 +164,11 @@ export default function AvatarUploadPage() {
 
             setIsUploading(true);
             try {
-              // 保存 token 到 localStorage
               if (token.trim()) {
                 localStorage.setItem('uploadToken', token.trim());
               }
 
-              const uploads = Array.from(fileList).map(async (file) => {
+              const uploads = selectedFiles.map(async (file) => {
                 const response = await fetch(
                   `/api/avatar/upload?filename=${encodeURIComponent(file.name)}`,
                   {
@@ -208,9 +231,9 @@ export default function AvatarUploadPage() {
             <div style={styles.dropzoneInner}>
               <span style={styles.dropzoneIcon}>⬆</span>
               <p style={styles.dropzoneText}>点击选择图片，或将文件拖入此处（最多 10 张）</p>
-              {fileNames.length > 0 && (
+              {selectedFiles.length > 0 && (
                 <p style={styles.fileName}>
-                  {fileNames.length} 个文件：{fileNames.join(', ')}
+                  {selectedFiles.length} 个文件：{selectedFiles.map((file) => file.name).join(', ')}
                 </p>
               )}
             </div>
@@ -262,7 +285,8 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     justifyContent: 'center',
     padding: '48px 16px',
-    background: 'radial-gradient(circle at 20% 20%, rgba(59,130,246,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(236,72,153,0.12), transparent 30%), #0b1221',
+    background:
+      'radial-gradient(circle at 20% 20%, rgba(59,130,246,0.12), transparent 35%), radial-gradient(circle at 80% 0%, rgba(236,72,153,0.12), transparent 30%), #0b1221',
   },
   card: {
     width: '100%',

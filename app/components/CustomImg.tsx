@@ -1,6 +1,14 @@
 import PrefixedImage from './PrefixedImage';
 
-const CustomImg = ({ src, alt }: { src?: string; alt?: string }) => {
+const CustomImg = ({
+  src,
+  alt,
+  loading,
+}: {
+  src?: string;
+  alt?: string;
+  loading?: 'eager' | 'lazy';
+}) => {
   if (!src) return null;
 
   let width = 200;
@@ -24,6 +32,7 @@ const CustomImg = ({ src, alt }: { src?: string; alt?: string }) => {
       alt={realAlt}
       width={width}
       height={height}
+      loading={loading}
       style={{ maxWidth: '100%', height: 'auto' }}
     />
   );

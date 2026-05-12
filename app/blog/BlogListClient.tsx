@@ -190,6 +190,7 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
                   alt={post.meta.title}
                   fill
                   preload={index < 2}
+                  loading={index < 2 ? 'eager' : 'lazy'}
                   className="object-cover transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-106"
                 />
               </div>

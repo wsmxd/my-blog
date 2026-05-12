@@ -40,6 +40,7 @@ const PostContent = async ({ post }: { post: Awaited<ReturnType<typeof getPostBy
             alt={post.meta.title}
             fill
             priority
+            loading="eager"
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 960px"
           />

@@ -37,6 +37,10 @@ function parseAspectRatio(value: string): number {
 }
 
 function softCompressAspectRatio(ratio: number): number {
+  if (ratio < 0.6) {
+    return 0.6;
+  }
+
   if (ratio <= 1) {
     return ratio;
   }
