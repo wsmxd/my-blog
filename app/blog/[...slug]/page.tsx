@@ -85,7 +85,7 @@ const PostContent = async ({ post }: { post: Awaited<ReturnType<typeof getPostBy
       <div className="prose-container bg-white dark:bg-slate-900/50 rounded-3xl p-6 sm:p-8 lg:p-12 shadow-none dark:shadow-xl backdrop-blur-lg border-slate-100 dark:border-slate-700/30 border relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/5 dark:bg-linear-to-br dark:from-blue-500/10 dark:to-purple-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative">
-          <MarkdownRenderer content={post.content} />
+          <MarkdownRenderer content={post.content} eagerImageCount={3} />
         </div>
       </div>
 

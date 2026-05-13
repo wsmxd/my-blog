@@ -5,7 +5,12 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import CustomImg from "./CustomImg";
 
-export default function MarkdownRenderer({ content }: { content: string }) {
+type MarkdownRendererProps = {
+  content: string;
+  eagerImageCount?: number;
+};
+
+export default function MarkdownRenderer({ content, eagerImageCount = 1 }: MarkdownRendererProps) {
   let imageIndex = 0;
 
   return (
@@ -33,10 +38,10 @@ export default function MarkdownRenderer({ content }: { content: string }) {
         ]}
         components={{
           img({ src, alt }: { src?: string; alt?: string; width?: string | number; height?: string | number }) {
-            const isFirstImage = imageIndex === 0;
+            const isEagerImage = imageIndex < eagerImageCount;
             imageIndex += 1;
 
-            return <CustomImg src={src} alt={alt} loading={isFirstImage ? 'eager' : 'lazy'} />;
+            return <CustomImg src={src} alt={alt} loading={isEagerImage ? 'eager' : 'lazy'} />;
           },
         }}
       >

@@ -105,6 +105,8 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
     },
   };
 
+  const coverImageSizes = '(max-width: 639px) 100vw, (max-width: 1023px) 50vw, (max-width: 1279px) 33vw, 33vw';
+
   return (
     <section className="space-y-6 pt-16 px-4 sm:px-6 relative overflow-x-hidden">
       <div className="absolute top-0 right-0 w-96 h-96 bg-purple-900/5 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -189,8 +191,9 @@ export default function BlogListClient({ posts, currentPage, totalPages, folders
                   src={post.meta.cover || '/images/default-cover.svg'}
                   alt={post.meta.title}
                   fill
-                  preload={index < 2}
-                  loading={index < 2 ? 'eager' : 'lazy'}
+                  preload={index < 3}
+                  loading={index < 3 ? 'eager' : 'lazy'}
+                  sizes={coverImageSizes}
                   className="object-cover transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-106"
                 />
               </div>

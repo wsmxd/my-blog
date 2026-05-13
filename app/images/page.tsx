@@ -98,6 +98,10 @@ function getFileName(pathname: string): string {
   return pathname.split('/').pop() || pathname;
 }
 
+function isGalleryBlob(blob: Pick<GalleryBlob, 'pathname'>): boolean {
+  return blob.pathname.startsWith('image-bed/') || blob.pathname.startsWith('images/');
+}
+
 export default function ImagesPage() {
   const [items, setItems] = useState<GalleryBlob[]>([]);
   const [hasMore, setHasMore] = useState(true);
@@ -150,7 +154,8 @@ export default function ImagesPage() {
       const nextCursorState = payload.cursor ? parseCursor(payload.cursor) : null;
       const nextHasMore = Boolean(payload.hasMore);
 
-      setItems((current) => (reset ? mergeUnique(nextItems) : mergeUnique([...current, ...nextItems])));
+      const galleryItems = nextItems.filter(isGalleryBlob);
+      setItems((current) => (reset ? mergeUnique(galleryItems) : mergeUnique([...current, ...galleryItems])));
       setHasMore(nextHasMore);
       cursorRef.current = nextCursorState;
       hasMoreRef.current = nextHasMore;

@@ -23,6 +23,10 @@ type GalleryBlob = {
   source: 'vercel' | 'cloudflare';
 };
 
+function isGalleryBlob(blob: { pathname: string }): boolean {
+  return blob.pathname.startsWith('image-bed/') || blob.pathname.startsWith('images/');
+}
+
 function getWorkerImageListUrl(limit: number): string | null {
   const base = process.env.WORKER_UPLOAD_URL?.trim();
   if (!base) {
@@ -87,7 +91,9 @@ export async function GET(request: Request): Promise<NextResponse> {
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
-    const blobs: GalleryBlob[] = result.blobs.map(normalizeVercelBlob);
+    const blobs: GalleryBlob[] = result.blobs
+      .filter(isGalleryBlob)
+      .map(normalizeVercelBlob);
 
     const workerImageListUrl = getWorkerImageListUrl(limit);
     if (workerImageListUrl) {
@@ -107,7 +113,7 @@ export async function GET(request: Request): Promise<NextResponse> {
             cursor?: string;
             hasMore?: boolean;
           };
-          blobs.push(...(workerPayload.blobs || []).map(normalizeCloudflareBlob));
+          blobs.push(...(workerPayload.blobs || []).filter(isGalleryBlob).map(normalizeCloudflareBlob));
 
           const hasMore = Boolean(result.hasMore || workerPayload.hasMore);
           const nextCursor = hasMore
