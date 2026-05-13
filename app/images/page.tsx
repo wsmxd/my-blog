@@ -400,7 +400,7 @@ export default function ImagesPage() {
                   src={item.url}
                   alt={fileName}
                   fill
-                  priority={index < 2}
+                  preload={index < 2}
                   loading={index < 2 ? 'eager' : 'lazy'}
                   sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw"
                   className={styles.image}
@@ -468,7 +468,7 @@ export default function ImagesPage() {
               src={previewImage.url}
               alt={previewImage.fileName}
               fill
-              priority
+              preload
               sizes="(max-width: 960px) 100vw, 92vw"
               className={styles.previewImage}
             />
