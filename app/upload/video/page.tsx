@@ -67,7 +67,7 @@ export default function VideoUploadPage() {
                 localStorage.setItem('uploadVideoToken', token.trim());
               }
 
-              const response = await fetch(`/api/videos/upload?filename=${encodeURIComponent(file.name)}`, {
+              const response = await fetch(`https://wsmxd.top/upload-worker/upload?filename=${encodeURIComponent(file.name)}`, {
                 method: 'POST',
                 body: file,
                 headers: {
