@@ -10,8 +10,12 @@ const remotePatterns: NonNullable<NextConfig['images']>['remotePatterns'] = [
     hostname: '**.r2.cloudflarestorage.com',
   },
   {
-  protocol: 'https',
-  hostname: '**.wsmxd.top',  // 匹配 wsmxd.top 和所有子域名
+    protocol: 'https',
+    hostname: 'wsmxd.top',
+  },
+  {
+    protocol: 'https',
+    hostname: '**.wsmxd.top',
   },
 ];
 
