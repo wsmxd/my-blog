@@ -10,8 +10,8 @@ const remotePatterns: NonNullable<NextConfig['images']>['remotePatterns'] = [
     hostname: '**.r2.cloudflarestorage.com',
   },
   {
-    protocol: 'https',
-    hostname: 'wsmxd.top',
+  protocol: 'https',
+  hostname: '**.wsmxd.top',  // 匹配 wsmxd.top 和所有子域名
   },
 ];
 
@@ -64,11 +64,18 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // vercel 默认域名 → 主域名
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'mxd-blog.vercel.app' }],
         destination: 'https://wsmxd.top/:path*',
-        permanent: true, // 301 redirect
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.wsmxd.top' }],
+        destination: 'https://wsmxd.top/:path*',
+        permanent: true,
       },
     ];
   },
