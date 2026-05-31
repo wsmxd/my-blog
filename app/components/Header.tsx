@@ -27,12 +27,7 @@ const primaryNavItems: NavItem[] = [
   { href: '/scripts', label: '脚本' },
   { href: '/images', label: '图床' },
   { href: '/upload', label: '上传' },
-  {
-    href: 'https://github.com/wsmxd/my-blog',
-    label: 'GitHub',
-    target: '_blank',
-    rel: 'noopener noreferrer',
-  },
+  { href: '/tools/md-convert', label: 'MD转换' },
 ];
 
 export default function Header() {
