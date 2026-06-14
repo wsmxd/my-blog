@@ -72,16 +72,15 @@ export default function MdConvertPage() {
         useCORS: true, 
         logging: false,
         onclone: (clonedDoc: Document) => {
-          // Remove all default stylesheets to prevent Tailwind "lab/oklch" CSS from crashing html2canvas
           clonedDoc.querySelectorAll('style, link[rel="stylesheet"]').forEach(el => el.remove());
 
-          // Inject clean, safe standard GitHub-like Markdown styles for PDF rendering
           const style = clonedDoc.createElement('style');
           style.innerHTML = INDEPENDENT_CSS;
           clonedDoc.head.appendChild(style);
         }
       },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
     
     html2pdf().set(opt).from(element).save();
