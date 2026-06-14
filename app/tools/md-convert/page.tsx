@@ -54,36 +54,55 @@ export default function MdConvertPage() {
     document.body.removeChild(fileDownload);
   };
 
-  const exportPDF = async () => {
+  const exportPDF = () => {
     if (!previewRef.current) return;
-    
-    // dynamically import to avoid SSR issues with window/document
-    const html2pdfModule = await import('html2pdf.js');
-    const html2pdf = html2pdfModule.default || html2pdfModule;
 
-    const element = previewRef.current;
-    
-    const opt = {
-      margin:       10,
-      filename:     'document.pdf',
-      image:        { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas:  { 
-        scale: 2, 
-        useCORS: true, 
-        logging: false,
-        onclone: (clonedDoc: Document) => {
-          clonedDoc.querySelectorAll('style, link[rel="stylesheet"]').forEach(el => el.remove());
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
 
-          const style = clonedDoc.createElement('style');
-          style.innerHTML = INDEPENDENT_CSS;
-          clonedDoc.head.appendChild(style);
-        }
-      },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
-      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+    const htmlContent = previewRef.current.innerHTML;
+    const printDoc = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>导出 PDF</title>
+  <style>
+    @page { size: A4; margin: 15mm; }
+    body { background: #ffffff; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color: #24292e; line-height: 1.6; }
+    .print-content { padding: 0; }
+    .print-content blockquote, .print-content details, .print-content dl, .print-content ol, .print-content p, .print-content pre, .print-content table, .print-content ul { margin-top: 0; margin-bottom: 16px; break-inside: avoid; page-break-inside: avoid; }
+    .print-content h1, .print-content h2, .print-content h3, .print-content h4, .print-content h5, .print-content h6 { color: #24292e; font-weight: 600; margin-top: 24px; margin-bottom: 16px; break-after: avoid; page-break-after: avoid; break-inside: avoid; page-break-inside: avoid; }
+    .print-content h1, .print-content h2 { border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+    .print-content table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+    .print-content table th, .print-content table td { border: 1px solid #dfe2e5; padding: 6px 13px; }
+    .print-content table tr:nth-child(2n) { background-color: #f6f8fa; }
+    .print-content pre { background: #f6f8fa; padding: 16px; overflow: auto; border-radius: 6px; margin-bottom: 16px; }
+    .print-content pre code { color: #24292e; background: none; padding: 0; border: none; font-size: 85%; line-height: 1.45; }
+    .print-content code { background: rgba(27,31,35,0.05); padding: 0.2em 0.4em; border-radius: 3px; font-family: Consolas, monospace; color: #24292e; font-size: 85%; }
+    .print-content img { max-width: 100%; box-sizing: content-box; background-color: #fff; break-inside: avoid; page-break-inside: avoid; }
+    .print-content blockquote { border-left: 4px solid #dfe2e5; padding: 0 1em; color: #6a737d; break-inside: avoid; page-break-inside: avoid; }
+    .print-content li { break-inside: avoid; page-break-inside: avoid; }
+    .print-content a { color: #0366d6; text-decoration: none; }
+    .hljs-comment, .hljs-quote { color: #6a737d; }
+    .hljs-keyword, .hljs-selector-tag, .hljs-addition { color: #d73a49; }
+    .hljs-number, .hljs-string, .hljs-meta .hljs-meta-string, .hljs-literal, .hljs-doctag, .hljs-regexp { color: #032f62; }
+    .hljs-title, .hljs-section, .hljs-name, .hljs-selector-id, .hljs-selector-class { color: #6f42c1; }
+    .hljs-attribute, .hljs-attr, .hljs-variable, .hljs-template-variable, .hljs-class .hljs-title, .hljs-type { color: #e36209; }
+    .hljs-symbol, .hljs-bullet, .hljs-subst, .hljs-meta, .hljs-meta .hljs-keyword, .hljs-selector-attr, .hljs-selector-pseudo, .hljs-link { color: #005cc5; }
+    .hljs-built_in, .hljs-deletion { color: #b31d28; }
+  </style>
+</head>
+<body>
+  <div class="print-content">${htmlContent}</div>
+</body>
+</html>`;
+
+    printWindow.document.write(printDoc);
+    printWindow.document.close();
+    printWindow.onload = () => {
+      printWindow.print();
+      printWindow.close();
     };
-    
-    html2pdf().set(opt).from(element).save();
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
