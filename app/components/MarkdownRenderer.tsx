@@ -11,7 +11,7 @@ type MarkdownRendererProps = {
 };
 
 export default function MarkdownRenderer({ content, eagerImageCount = 1 }: MarkdownRendererProps) {
-  let imageIndex = 0;
+  const imageIndex = { current: 0 };
 
   return (
     // prose prose-slate dark:prose-invert这些样式会导致在浏览器中内容显示被限制在了一定的宽度，而导致右边有很多空白
@@ -38,8 +38,8 @@ export default function MarkdownRenderer({ content, eagerImageCount = 1 }: Markd
         ]}
         components={{
           img({ src, alt }: { src?: string; alt?: string; width?: string | number; height?: string | number }) {
-            const isEagerImage = imageIndex < eagerImageCount;
-            imageIndex += 1;
+            const isEagerImage = imageIndex.current < eagerImageCount;
+            imageIndex.current += 1;
 
             return <CustomImg src={src} alt={alt} loading={isEagerImage ? 'eager' : 'lazy'} />;
           },

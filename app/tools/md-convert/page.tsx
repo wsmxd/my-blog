@@ -6,17 +6,19 @@ import MarkdownRenderer from '@/app/components/MarkdownRenderer';
 const INDEPENDENT_CSS = `
   body { background: #ffffff !important; margin: 0; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; color: #24292e; line-height: 1.6; }
   .print-content { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.6; color: #24292e; background: #ffffff; }
-  .print-content blockquote, .print-content details, .print-content dl, .print-content ol, .print-content p, .print-content pre, .print-content table, .print-content ul { margin-top: 0; margin-bottom: 16px; }
-  .print-content h1, .print-content h2, .print-content h3, .print-content h4, .print-content h5, .print-content h6 { color: #24292e; font-weight: 600; margin-top: 24px; margin-bottom: 16px; }
+  .print-content blockquote, .print-content details, .print-content dl, .print-content ol, .print-content p, .print-content pre, .print-content table, .print-content ul { margin-top: 0; margin-bottom: 16px; break-inside: avoid; page-break-inside: avoid; }
+  .print-content h1, .print-content h2, .print-content h3, .print-content h4, .print-content h5, .print-content h6 { color: #24292e; font-weight: 600; margin-top: 24px; margin-bottom: 16px; break-after: avoid; page-break-after: avoid; break-inside: avoid; page-break-inside: avoid; }
   .print-content h1, .print-content h2 { border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
   .print-content table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
   .print-content table th, .print-content table td { border: 1px solid #dfe2e5; padding: 6px 13px; }
+  .print-content table tr { break-inside: avoid; page-break-inside: avoid; }
   .print-content table tr:nth-child(2n) { background-color: #f6f8fa; }
   .print-content pre { background: #f6f8fa; padding: 16px; overflow: auto; border-radius: 6px; margin-bottom: 16px; }
   .print-content pre code { color: #24292e; background: none; padding: 0; border: none; font-size: 85%; line-height: 1.45; }
   .print-content code { background: rgba(27,31,35,0.05); padding: 0.2em 0.4em; border-radius: 3px; font-family: Consolas, monospace; color: #24292e; font-size: 85%; }
   .print-content img { max-width: 100%; box-sizing: content-box; background-color: #fff; }
-  .print-content blockquote { border-left: 4px solid #dfe2e5; padding: 0 1em; color: #6a737d; }
+  .print-content blockquote { border-left: 4px solid #dfe2e5; padding: 0 1em; color: #6a737d; break-inside: avoid; page-break-inside: avoid; }
+  .print-content li { break-inside: avoid; page-break-inside: avoid; }
   .print-content a { color: #0366d6; text-decoration: none; }
   .hljs-comment, .hljs-quote { color: #6a737d; }
   .hljs-keyword, .hljs-selector-tag, .hljs-addition { color: #d73a49; }
